@@ -6,7 +6,7 @@ hero:
   text: "Because RPMs have stories to tell"
   tagline: Our system tracks package transactions on RPM-based systems, compiling data on the number of updates and installations.
   image:
-    src: /images/logbook.png
+    src: /logbook.png
     alt: The Logbook
   actions:
     - theme: brand
