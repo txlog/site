@@ -1,29 +1,45 @@
----
-# https://vitepress.dev/reference/default-theme-home-page
-layout: home
+# Runtime API Examples
 
-hero:
-  text: "Because RPMs have stories to tell"
-  tagline: Our system tracks package transactions on RPM-based systems, compiling data on the number of updates and installations.
-  image:
-    src: /images/logbook.png
-    alt: The Logbook
-  actions:
-    - theme: brand
-      text: Quickstart
-      link: /docs/
-    - theme: alt
-      text: Download
-      link: /download/
+This page demonstrates usage of some of the runtime APIs provided by VitePress.
 
-features:
-  - icon: 📜
-    title: Comprehensive Transaction Tracking
-    details: The system meticulously records all package transactions, including installations, updates, and removals, providing a complete history of package activity on the system.
-  - icon: 🗃️
-    title: Detailed Data Compilation
-    details: Beyond simple counts, the system compiles comprehensive data on updates and installations, such as frequency, package names, versions, and potentially even dependencies.
-  - icon: 📦
-    title: RPM System Focus
-    details: The system specializes in tracking packages on RPM-based systems, ensuring compatibility and accurate data collection for distributions like AlmaLinux, Fedora, and Red Hat Enterprise Linux.
----
+The main `useData()` API can be used to access site, theme, and page data for the current page. It works in both `.md` and `.vue` files:
+
+```md
+<script setup>
+import { useData } from 'vitepress'
+
+const { theme, page, frontmatter } = useData()
+</script>
+
+## Results
+
+### Theme Data
+<pre>{{ theme }}</pre>
+
+### Page Data
+<pre>{{ page }}</pre>
+
+### Page Frontmatter
+<pre>{{ frontmatter }}</pre>
+```
+
+<script setup>
+import { useData } from 'vitepress'
+
+const { site, theme, page, frontmatter } = useData()
+</script>
+
+## Results
+
+### Theme Data
+<pre>{{ theme }}</pre>
+
+### Page Data
+<pre>{{ page }}</pre>
+
+### Page Frontmatter
+<pre>{{ frontmatter }}</pre>
+
+## More
+
+Check out the documentation for the [full list of runtime APIs](https://vitepress.dev/reference/runtime-api#usedata).
