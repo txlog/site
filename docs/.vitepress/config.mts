@@ -13,23 +13,20 @@ export default defineConfig({
     },
 
     nav: [
-      { text: 'Home', link: '/' },
-      { text: 'Quickstart', link: '/docs/' },
       { text: 'Download', link: '/download/' }
     ],
 
     sidebar: [
       {
-        text: 'Docs',
+        text: 'Agent',
         items: [
-          { text: 'Quickstart', link: '/docs/' }
+          { text: 'Docs', link: '/agent/docs/' }
         ]
       },
       {
-        text: 'Help',
+        text: 'Server',
         items: [
-          { text: 'Markdown Examples', link: '/markdown-examples' },
-          { text: 'Runtime API Examples', link: '/api-examples' }
+          { text: 'Docs', link: '/server/docs/' }
         ]
       }
     ],
