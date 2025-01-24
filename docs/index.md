@@ -11,10 +11,10 @@ hero:
   actions:
     - theme: brand
       text: Quickstart
-      link: /agent/docs/
+      link: /docs/agent
     - theme: alt
       text: Download
-      link: /download/
+      link: /download
 
 features:
   - icon: 📜

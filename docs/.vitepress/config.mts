@@ -4,6 +4,7 @@ import { defineConfig } from 'vitepress'
 export default defineConfig({
   title: "Transaction Log",
   description: "Transaction Log tracks package transactions on RPM systems, compiling data on the number of updates and installs.",
+  cleanUrls: true,
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config`
     logo: '/images/logbook.png',
@@ -13,20 +14,20 @@ export default defineConfig({
     },
 
     nav: [
-      { text: 'Download', link: '/download/' }
+      { text: 'Download', link: '/download' }
     ],
 
     sidebar: [
       {
         text: 'Agent',
         items: [
-          { text: 'Docs', link: '/agent/docs/' }
+          { text: 'Docs', link: '/docs/agent' }
         ]
       },
       {
         text: 'Server',
         items: [
-          { text: 'Docs', link: '/server/docs/' }
+          { text: 'Docs', link: '/docs/server' }
         ]
       }
     ],
