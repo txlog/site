@@ -32,23 +32,17 @@ into the evolution of packages.
 
 ## CONFIGURATION FILE
 
-**/etc/txlog.conf**
-Normally `txlog` uses sane defaults, but if you want to
-activate any option or integration, go to this file, uncomment the section and
-modify it. Useful during development, since you can set another parameters for
-this environment.
+**/etc/txlog.yaml**
+Normally `txlog` uses sane defaults, but if you want to activate any option or
+integration, go to this file, uncomment the section and modify it. Useful during
+development, since you can set another parameters for this environment.
 
 ## CONFIGURATION OPTIONS
 
-All data is sent to a PostgreSQL database, using a
-[PostgREST](https://postgrest.org) instance. The PostgREST address and
-authentication token can be set in the configuration file.
+All data is sent to the Transaction Log server.
 
 **url**
-: URL address of PostgREST instance
-
-**auth**
-: The JWT token for PostgREST instance, containing the database role on the payload
+: URL address of a Transaction Log server instance
 
 ## QUERY FILTERS
 
