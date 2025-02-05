@@ -49,19 +49,14 @@ txlog [OPTION]
 -h, --help: You know what this option does
 ```
 
-## QUERY FILTERS
+### Query filters
 
 You can pass filters to the **query** option to display the compiled
 transactions for a given host or transaction.
 
-**-q**
-: returns transaction list from the current machine
-
-**-q "machine_id: 123456789"**
-: returns transaction list from the machine in question
-
-**-q "machine_id: 123456789, transaction_id: 1"**
-: returns information from transaction `1`
-
-**-q "machine_id: 123456789, transaction_id: 1-5"**
-: returns information from transactions `1` through `5`
+```bash
+-q: returns transaction list from the current machine
+-q "machine_id: 123456789": returns transaction list from the machine in question
+-q "machine_id: 123456789, transaction_id: 1": returns information from transaction `1`
+-q "machine_id: 123456789, transaction_id: 1-5": returns information from transactions `1` through `5`
+```
