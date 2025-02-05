@@ -5,7 +5,6 @@ export default defineConfig({
   title: "Transaction Log",
   description: "Transaction Log tracks package transactions on RPM systems, compiling data on the number of updates and installs.",
   cleanUrls: true,
-  mpa: true,
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config`
     logo: '/images/logbook.png',
