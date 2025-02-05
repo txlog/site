@@ -31,5 +31,9 @@ export default defineConfig({
     socialLinks: [
       { icon: 'github', link: 'https://github.com/txlog' }
     ]
+  },
+  sitemap: {
+    hostname: 'https://txlog.rda.run',
+    lastmodDateOnly: false
   }
 })
