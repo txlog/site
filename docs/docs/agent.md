@@ -1,48 +1,53 @@
-# Agent manpage
+# Txlog Agent
 
-## NAME
+The **txlog** agent aims to track package transactions on RPM systems, compiling
+data on the number of updates and installs. Designed to enhance system
+reliability, this initiative collects and centralizes information, providing
+valuable insights into the evolution of packages.
 
-**txlog**: Compile data on the number of updates and installs using
-yum / dnf transaction info.
+## System Requirements
 
-## SYNOPSIS
+The **txlog** agent requires
 
-**txlog** [*OPTION*]
+* a RHEL-compatible Linux workstation with the `dnf`
+package manager installed.
+* a Txlog Server deployed in the network
 
-## DESCRIPTION
+## Installation
 
-**txlog** aims to track package transactions on RPM systems, compiling data on the
-number of updates and installs. Designed to enhance system reliability, this
-initiative collects and centralizes information, providing valuable insights
-into the evolution of packages.
+Add the RPM repository and install the agent.
 
-## OPTIONS
+```bash
+sudo dnf localinstall -y https://rpm.rda.run/rpm-rda-run-1.0-1.noarch.rpm
+sudo dnf install -y txlog
+```
 
-**-b**, **\--build**
-: Compile transaction info
+## Configuration
 
-**-q**, **\--query**
-: List compiled transactions
+You need to set your Txlog Server address on `/etc/txlog.yaml` file.
 
-**-v**, **\--version**
-: Show version number
+::: code-group
 
-**-h**, **\--help**
-: You know what this option does
+```yaml [/etc/txlog.yaml]
+server:
+  url: https://txlog-server.example.com:8080
+```
 
-## CONFIGURATION FILE
+:::
 
-**/etc/txlog.yaml**
-Normally `txlog` uses sane defaults, but if you want to activate any option or
-integration, go to this file, uncomment the section and modify it. Useful during
-development, since you can set another parameters for this environment.
+## Basic commands
 
-## CONFIGURATION OPTIONS
+All available commands and options can be obtained on the manpage, using `man
+txlog` command.
 
-All data is sent to the Transaction Log server.
+```bash
+txlog [OPTION]
 
-**url**
-: URL address of a Transaction Log server instance
+-b, --build: Compile transaction info
+-q, --query: List compiled transactions
+-v, --version: Show version number
+-h, --help: You know what this option does
+```
 
 ## QUERY FILTERS
 
@@ -60,13 +65,3 @@ transactions for a given host or transaction.
 
 **-q "machine_id: 123456789, transaction_id: 1-5"**
 : returns information from transactions `1` through `5`
-
-## BUGS
-
-Submit bug reports online at
-<https://github.com/txlog/agent/issues>
-
-## SEE ALSO
-
-Full documentation and sources at
-<https://github.com/txlog>

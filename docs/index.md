@@ -11,10 +11,7 @@ hero:
   actions:
     - theme: brand
       text: Quickstart
-      link: /docs/agent
-    - theme: alt
-      text: Download
-      link: /download
+      link: /docs
 
 features:
   - icon: 📜
