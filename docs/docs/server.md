@@ -58,8 +58,6 @@ ALTER TABLE "transaction_items" ADD FOREIGN KEY ("transaction_id", "machine_id")
 
 The Txlog server can be easily deployed using Docker or using kuberentes. First, pull the container image from the GitHub Container Registry:
 
-
-
 ::: code-group
 
 ```bash [Docker]
