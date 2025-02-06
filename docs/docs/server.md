@@ -71,7 +71,7 @@ docker run -d -p 8080:8080 \
   -e PGSQL_DB=txlog \
   -e PGSQL_PASSWORD=your_db_password \
   -e PGSQL_SSLMODE=require \
-  ghcr.rda.run/txlog/server:v0.1
+  ghcr.rda.run/txlog/server:v0.2
 ```
 
 ```yaml [Kubernetes]
@@ -91,7 +91,7 @@ spec:
     spec:
       containers:
       - name: txlog-server
-        image: ghcr.rda.run/txlog/server:v0.1
+        image: ghcr.rda.run/txlog/server:v0.2
         ports:
         - containerPort: 8080
         livenessProbe:
@@ -107,8 +107,6 @@ spec:
           initialDelaySeconds: 5
           periodSeconds: 10
         env:
-        - name: GIN_MODE
-          value: "release"
         - name: PGSQL_HOST
           value: "postgres.example.com"
         - name: PGSQL_PORT
@@ -129,5 +127,5 @@ spec:
 :::
 
 If you want to use the latest development (unstable) version, replace the
-version number `v0.1` with `main` in the Docker commands and Kubernetes
+version number `v0.2` with `main` in the Docker commands and Kubernetes
 configuration.
