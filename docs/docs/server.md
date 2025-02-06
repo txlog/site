@@ -62,7 +62,6 @@ The Txlog server can be easily deployed using Docker or using kuberentes. First,
 
 ```bash [Docker]
 docker run -d -p 8080:8080 \
-  -e GIN_MODE=release \
   -e PGSQL_HOST=postgres.example.com \
   -e PGSQL_PORT=5432 \
   -e PGSQL_USER=txlog \
