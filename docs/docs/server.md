@@ -52,6 +52,17 @@ CREATE TABLE "transaction_items" (
 );
 
 ALTER TABLE "transaction_items" ADD FOREIGN KEY ("transaction_id", "machine_id") REFERENCES "transactions" ("transaction_id", "machine_id");
+
+CREATE TABLE "executions" (
+  "id" SERIAL PRIMARY KEY,
+  "machine_id" text NOT NULL,
+  "hostname" text NOT NULL,
+  "executed_at" timestamp with time zone NOT NULL,
+  "success" boolean NOT NULL,
+  "details" text,
+  "transactions_processed" integer,
+  "transactions_sent" integer
+)
 ```
 
 ## Installation
@@ -68,7 +79,7 @@ docker run -d -p 8080:8080 \
   -e PGSQL_DB=txlog \
   -e PGSQL_PASSWORD=your_db_password \
   -e PGSQL_SSLMODE=require \
-  ghcr.rda.run/txlog/server:v0.2
+  ghcr.rda.run/txlog/server:v0.3
 ```
 
 ```yaml [Kubernetes]
@@ -88,7 +99,7 @@ spec:
     spec:
       containers:
       - name: txlog-server
-        image: ghcr.rda.run/txlog/server:v0.2
+        image: ghcr.rda.run/txlog/server:v0.3
         ports:
         - containerPort: 8080
         livenessProbe:
@@ -124,5 +135,5 @@ spec:
 :::
 
 If you want to use the latest development (unstable) version, replace the
-version number `v0.2` with `main` in the Docker commands and Kubernetes
+version number `v0.3` with `main` in the Docker commands and Kubernetes
 configuration.
