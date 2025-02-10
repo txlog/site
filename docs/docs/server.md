@@ -79,7 +79,7 @@ docker run -d -p 8080:8080 \
   -e PGSQL_DB=txlog \
   -e PGSQL_PASSWORD=your_db_password \
   -e PGSQL_SSLMODE=require \
-  ghcr.rda.run/txlog/server:v0.3
+  cr.rda.run/txlog/server:v0.3
 ```
 
 ```yaml [Kubernetes]
@@ -99,7 +99,7 @@ spec:
     spec:
       containers:
       - name: txlog-server
-        image: ghcr.rda.run/txlog/server:v0.3
+        image: cr.rda.run/txlog/server:v0.3
         ports:
         - containerPort: 8080
         livenessProbe:
