@@ -79,7 +79,8 @@ docker run -d -p 8080:8080 \
   -e PGSQL_DB=txlog \
   -e PGSQL_PASSWORD=your_db_password \
   -e PGSQL_SSLMODE=require \
-  cr.rda.run/txlog/server:v0.3
+  -e EXECUTION_RETENTION_DAYS=7 \
+  cr.rda.run/txlog/server:v0.4
 ```
 
 ```yaml [Kubernetes]
@@ -99,7 +100,7 @@ spec:
     spec:
       containers:
       - name: txlog-server
-        image: cr.rda.run/txlog/server:v0.3
+        image: cr.rda.run/txlog/server:v0.4
         ports:
         - containerPort: 8080
         livenessProbe:
@@ -129,11 +130,13 @@ spec:
               name: txlog-secrets
               key: db-password
         - name: PGSQL_SSLMODE
-          value: "require"
+          value: "require"`
+        - name: EXECUTION_RETENTION_DAYS
+          value: 7
 ```
 
 :::
 
 If you want to use the latest development (unstable) version, replace the
-version number `v0.3` with `main` in the Docker commands and Kubernetes
+version number `v0.4` with `main` in the Docker commands and Kubernetes
 configuration.
