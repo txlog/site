@@ -34,3 +34,8 @@ The data flow in Txlog follows these key steps:
    and transmitted from each agent to the central Txlog server.
 4. The Txlog server validates incoming data and permanently stores it in a
    structured format within the PostgreSQL database for analysis and auditing.
+
+## Disclaimer
+
+* RPM is a trademark of Red Hat, Inc., registered in the United States and other countries.
+* Logbook icon created by [smashingstocks](https://www.flaticon.com/authors/smashingstocks), available on Flaticon.
