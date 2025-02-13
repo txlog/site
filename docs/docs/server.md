@@ -80,7 +80,7 @@ docker run -d -p 8080:8080 \
   -e PGSQL_PASSWORD=your_db_password \
   -e PGSQL_SSLMODE=require \
   -e EXECUTION_RETENTION_DAYS=7 \
-  cr.rda.run/txlog/server:v0.4
+  cr.rda.run/txlog/server:v1.0
 ```
 
 ```yaml [Kubernetes]
@@ -100,7 +100,7 @@ spec:
     spec:
       containers:
       - name: txlog-server
-        image: cr.rda.run/txlog/server:v0.4
+        image: cr.rda.run/txlog/server:v1.0
         ports:
         - containerPort: 8080
         livenessProbe:
@@ -138,5 +138,17 @@ spec:
 :::
 
 If you want to use the latest development (unstable) version, replace the
-version number `v0.4` with `main` in the Docker commands and Kubernetes
+version number `v1.0` with `main` in the Docker commands and Kubernetes
 configuration.
+
+## API Docs
+
+Once the server is running, you can access the API documentation through the
+Swagger UI interface at `http://<server-address>/swagger/index.html`.
+
+The Swagger UI provides an interactive documentation interface where you can:
+
+* Browse all available API endpoints
+* Try out API calls directly from the browser
+* View request/response schemas
+* See detailed parameter descriptions
