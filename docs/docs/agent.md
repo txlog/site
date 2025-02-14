@@ -46,7 +46,6 @@ Usage:
 
 Available Commands:
   build        Compile transaction info
-  completion   Generate the autocompletion script for the specified shell
   executions   List build executions
   help         Help about any command
   items        List transactions items
