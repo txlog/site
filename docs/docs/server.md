@@ -39,7 +39,7 @@ docker run -d -p 8080:8080 \`
   -e PGSQL_DB=txlog \
   -e PGSQL_PASSWORD=your_db_password \
   -e PGSQL_SSLMODE=require \
-  -e EXECUTION_RETENTION_DAYS=7 \
+  -e CRON_RETENTION_DAYS=7 \
   -e CRON_RETENTION_EXPRESSION=0 2 * * * \
   -e CRON_STATS_EXPRESSION=0 1 * * * \
   cr.rda.run/txlog/server:v1.2.0
@@ -97,7 +97,7 @@ spec:
               key: db-password
         - name: PGSQL_SSLMODE
           value: "require"
-        - name: EXECUTION_RETENTION_DAYS
+        - name: CRON_RETENTION_DAYS
           value: 7
         - name: CRON_RETENTION_EXPRESSION
           value: "0 2 * * *"
