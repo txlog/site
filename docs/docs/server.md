@@ -25,7 +25,8 @@ CREATE DATABASE "txlog" WITH ENCODING = 'UTF8';
 
 ## Installation
 
-The Txlog server can be easily deployed using Docker or using kuberentes. First, pull the container image from the GitHub Container Registry:
+The Txlog server can be easily deployed using Docker or using kuberentes. First,
+pull the container image from the GitHub Container Registry:
 
 ::: code-group
 
@@ -42,7 +43,7 @@ docker run -d -p 8080:8080 \`
   -e CRON_RETENTION_DAYS=7 \
   -e CRON_RETENTION_EXPRESSION=0 2 * * * \
   -e CRON_STATS_EXPRESSION=0 1 * * * \
-  cr.rda.run/txlog/server:v1.2.0
+  cr.rda.run/txlog/server:main
 ```
 
 ```yaml [Kubernetes]
@@ -62,7 +63,7 @@ spec:
     spec:
       containers:
       - name: txlog-server
-        image: cr.rda.run/txlog/server:v1.2.0
+        image: cr.rda.run/txlog/server:main
         ports:
         - containerPort: 8080
         livenessProbe:
@@ -107,18 +108,17 @@ spec:
 
 :::
 
-If you want to use the latest development (unstable) version, replace the
-version number `v1.2.0` with `main` in the Docker commands and Kubernetes
-configuration.
+If you want to use a production (stable) version, replace `main` by the version
+number (e.g. `v1.0`) in the Docker commands and Kubernetes configuration.
 
-## API Docs
+## UI and API
 
-Once the server is running, you can access the API documentation through the
-Swagger UI interface at `http://<server-address>/swagger/index.html`.
+Once the server is running, you can access its interface at `http://<server-address>:8080`. From there, you can:
 
-The Swagger UI provides an interactive documentation interface where you can:
-
-* Browse all available API endpoints
-* Try out API calls directly from the browser
-* View request/response schemas
-* See detailed parameter descriptions
+* View all collected transaction logs
+* Monitor system statistics
+* Access the API documentation through Swagger UI, where you can:
+  * Browse all available API endpoints
+  * Try out API calls directly from the browser
+  * View request/response schemas
+  * See detailed parameter descriptions
