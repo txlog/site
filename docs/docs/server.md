@@ -111,6 +111,25 @@ spec:
 If you want to use a production (stable) version, replace `main` by the version
 number (e.g. `v1.0`) in the Docker commands and Kubernetes configuration.
 
+## Options
+
+The Txlog Server can be configured using the following environment variables:
+
+| Variable | Description | Example |
+|----------|-------------|---------|
+| `INSTANCE` | A name to identify this server instance | `My Datacenter` |
+| `LOG_LEVEL` | The logging level (DEBUG, INFO, WARN, ERROR) | `ERROR` |
+| `PGSQL_HOST` | PostgreSQL server hostname | `postgres.example.com` |
+| `PGSQL_PORT` | PostgreSQL server port | `5432` |
+| `PGSQL_USER` | PostgreSQL username | `txlog` |
+| `PGSQL_DB` | PostgreSQL database name | `txlog` |
+| `PGSQL_PASSWORD` | PostgreSQL user password | `your_db_password` |
+| `PGSQL_SSLMODE` | PostgreSQL SSL mode (disable, require, verify-full) | `require` |
+| `CRON_RETENTION_DAYS` | Number of days to keep transaction logs | `7` |
+| `CRON_RETENTION_EXPRESSION` | Cron expression for log cleanup job | `0 2 * * *` |
+| `CRON_STATS_EXPRESSION` | Cron expression for statistics generation | `0 1 * * *` |
+| `IGNORE_EMPTY_TRANSACTION` | Skip logging of empty transactions | `true` |
+
 ## UI and API
 
 Once the server is running, you can access its interface at `http://<server-address>:8080`. From there, you can:
