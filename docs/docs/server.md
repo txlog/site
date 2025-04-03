@@ -104,6 +104,8 @@ spec:
           value: "0 2 * * *"
         - name: CRON_STATS_EXPRESSION
           value: "0 1 * * *"
+        - name: IGNORE_EMPTY_EXECUTION
+          value: true
 ```
 
 :::
@@ -128,7 +130,7 @@ The Txlog Server can be configured using the following environment variables:
 | `CRON_RETENTION_DAYS` | Number of days to keep transaction logs | `7` |
 | `CRON_RETENTION_EXPRESSION` | Cron expression for log cleanup job | `0 2 * * *` |
 | `CRON_STATS_EXPRESSION` | Cron expression for statistics generation | `0 1 * * *` |
-| `IGNORE_EMPTY_TRANSACTION` | Skip logging of empty transactions | `true` |
+| `IGNORE_EMPTY_EXECUTION` | Skip logging of empty executions | `true` |
 
 ## UI and API
 
