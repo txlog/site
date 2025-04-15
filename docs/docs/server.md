@@ -132,6 +132,15 @@ The Txlog Server can be configured using the following environment variables:
 | `CRON_STATS_EXPRESSION` | Cron expression for statistics generation | `0 1 * * *` |
 | `IGNORE_EMPTY_EXECUTION` | Skip logging of empty executions | `true` |
 
+## Authentication
+
+Currently, the server does not support built-in authentication, although the
+agent does. To secure your server, you can use a reverse proxy with basic
+authentication (like [Caddy](https://caddyserver.com/) or
+[Nginx](https://www.nginx.com/)) in front of the Txlog Server. Then, configure
+the [agent](https://txlog.rda.run/docs/agent#configuration) with the appropriate
+username and password to match your proxy's authentication settings.
+
 ## UI and API
 
 Once the server is running, you can access its interface at `http://<server-address>:8080`. From there, you can:

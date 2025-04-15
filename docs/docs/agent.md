@@ -30,7 +30,11 @@ You need to set your Txlog Server address on `/etc/txlog.yaml` file.
 
 ```yaml [/etc/txlog.yaml]
 server:
-  url: https://txlog-server.example.com:8080
+  url: https://txlog-server.example.com:8080`
+  # If your server requires basic authentication,
+  # uncomment and configure username and password below
+  # username: bob_tables
+  # password: correct-horse-battery-staple
 ```
 
 :::
