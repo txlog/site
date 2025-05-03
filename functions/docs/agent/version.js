@@ -1,8 +1,4 @@
-addEventListener('fetch', event => {
-  event.respondWith(handleRequest(event.request))
-})
-
-async function handleRequest(request) {
+export async function onRequest(context) {
   const GITHUB_API_URL = 'https://api.github.com/repos/txlog/agent/releases/latest';
 
   const headers = {
