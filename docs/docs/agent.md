@@ -29,12 +29,20 @@ You need to set your Txlog Server address on `/etc/txlog.yaml` file.
 ::: code-group
 
 ```yaml [/etc/txlog.yaml]
+# Agent configuration
+agent:
+  # Check on https://txlog.rda.run/agent/version
+  # if a new version of the agent is available
+  # when `txlog version` is run
+  check_version: true
+
+# Server configuration
 server:
-  url: https://txlog-server.example.com:8080`
+  url: https://txlog-server.example.com
   # If your server requires basic authentication,
   # uncomment and configure username and password below
-  # username: bob_tables
-  # password: correct-horse-battery-staple
+  username: bob_tables
+  password: correct-horse-battery-staple
 ```
 
 :::
