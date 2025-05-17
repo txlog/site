@@ -21,7 +21,7 @@ features:
   - icon:
       src: /images/data-compilation.svg
     title: Detailed Data Compilation
-    details: Beyond simple counts, the system compiles comprehensive data on updates and installations, such as frequency, package names, versions, and potentially even dependencies.
+    details: Beyond simple counts, the system compiles comprehensive data on updates and installations, such as frequency, package names, and versions.
   - icon:
       src: /images/server-restart.svg
     title: Track server restarts
