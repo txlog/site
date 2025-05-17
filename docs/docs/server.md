@@ -146,9 +146,6 @@ username and password to match your proxy's authentication settings.
 Once the server is running, you can access its interface at `http://<server-address>:8080`. From there, you can:
 
 * View all collected transaction logs
-* Monitor system statistics
-* Access the API documentation through Swagger UI, where you can:
-  * Browse all available API endpoints
-  * Try out API calls directly from the browser
-  * View request/response schemas
-  * See detailed parameter descriptions
+* Monitor package statistics
+* Track server restarts
+* Access the API documentation through Swagger UI
