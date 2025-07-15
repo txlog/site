@@ -13,6 +13,17 @@ recovery in case of system failures. It acts as a single source of truth for
 transaction history, making it an essential component for businesses that
 require precise transaction tracking and audit capabilities.
 
+In addition, the Txlog Server provides detailed information in the asset listing
+regarding whether a system restart is required to apply security updates. This
+feature is crucial for maintaining operational security and minimizing downtime,
+as it allows administrators to quickly identify assets that need immediate
+attention. By clearly indicating which updates are pending and whether a restart
+is necessary, the server helps ensure that critical patches are applied
+promptly, reducing the risk of vulnerabilities being exploited. This proactive
+approach supports compliance with security best practices and enables efficient
+planning for maintenance windows, ultimately contributing to the reliability and
+safety of the entire system.
+
 ## System Requirements
 
 Before running Txlog Server, ensure you have access to a PostgreSQL database
@@ -145,7 +156,51 @@ username and password to match your proxy's authentication settings.
 
 Once the server is running, you can access its interface at `http://<server-address>:8080`. From there, you can:
 
-* View all collected transaction logs
-* Monitor package statistics
-* Track server restarts
-* Access the API documentation through Swagger UI
+### View all collected transaction logs
+
+Transaction logs for each asset provide valuable insights into what software
+packages or updates have been installed and the exact time of installation. By
+reviewing these logs, administrators can track changes to system components,
+verify compliance with update policies, and quickly identify the source of
+recent modifications. This level of visibility is essential for auditing,
+troubleshooting, and ensuring that all assets remain up-to-date and secure.
+
+![Server Transactions](./server-transactions-2.png)
+
+![Server Transactions](./server-transactions.png)
+
+### Monitor package statistics
+
+Package statistics provide a comprehensive overview of how updates are being
+distributed across all assets in the system. By analyzing these statistics,
+administrators can identify which assets have received the latest security
+patches and which ones are pending updates. This visibility enables proactive
+management of vulnerabilities, ensuring that critical updates are delivered
+promptly and consistently. As a result, monitoring package statistics not only
+streamlines update deployment but also significantly enhances the overall
+security posture by reducing the risk of unpatched systems being exploited.
+
+![Server Home](./server-home.png)
+
+### Track server restarts
+
+Server restarts are crucial for applying updates and ensuring system stability.
+By tracking when a server was last restarted, administrators can determine if
+the latest updates have been applied successfully. This information is vital for
+maintaining operational efficiency and security, as it helps identify any
+pending restarts that may be necessary to complete the update process. By
+keeping a record of server restarts, organizations can ensure that their systems
+are running the most current software versions, thereby minimizing
+vulnerabilities and enhancing overall performance.
+
+![Server Restart](./server-restart.png)
+
+### Access the API documentation through Swagger UI
+
+The Txlog Server provides a comprehensive API for interacting with transaction
+logs and statistics. You can access the API documentation through Swagger UI at
+`http://<server-address>:8080/swagger`. This interface allows developers to
+explore available endpoints, understand request and response formats, and test
+API calls directly from the browser.
+
+![Server API](./server-api.png)
