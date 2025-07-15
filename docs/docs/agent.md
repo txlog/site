@@ -10,6 +10,12 @@ and then sending it to a specified Txlog server for storage and analysis. The
 agent is designed to be lightweight and efficient, minimizing its impact on
 system performance while ensuring accurate and timely data collection.
 
+In addition to tracking package transactions, the agent also collects
+information about whether a system reboot is required to apply security updates.
+This feature helps administrators quickly identify systems that need to be
+restarted to ensure all critical patches are active, improving overall security
+compliance and reducing operational risks.
+
 ## System Requirements
 
 The **txlog** agent requires
