@@ -14,7 +14,9 @@ export default defineConfig({
     },
 
     nav: [
-      { text: 'Quick Start', link: '/docs' }
+      { text: 'Quick Start', link: '/docs' },
+      { component: 'AgentVersionBadge' },
+      { component: 'ServerVersionBadge' }
     ],
 
     sidebar: [
