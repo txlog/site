@@ -39,8 +39,6 @@ The data flow in Txlog follows these key steps:
 
 * Logbook icon created by [smashingstocks](https://www.flaticon.com/authors/smashingstocks), available on [Flaticon](https://www.flaticon.com/free-icons/logbook).
 * PostgreSQL is a trademark of The PostgreSQL Global Development Group.
-* RPM is a trademark of Red Hat, Inc., registered in the United States and other countries.
-* DNF is a trademark of Red Hat, Inc.
-* RHEL is a trademark of Red Hat, Inc., registered in the United States and other countries.
+* RPM, DNF and RHEL are trademarks of Red Hat, Inc., registered in the United States and other countries.
 * Linux is a registered trademark of Linus Torvalds in the U.S. and other countries.
 * All other trademarks are the property of their respective owners.
