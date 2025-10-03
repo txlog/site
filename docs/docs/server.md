@@ -145,18 +145,23 @@ The Txlog Server can be configured using the following environment variables:
 
 ## Authentication
 
-The Txlog Server provides **optional** authentication support through OpenID Connect (OIDC). When enabled, authentication protects the web interface while keeping the API endpoints open for agent access.
+The Txlog Server provides **optional** authentication support through OpenID
+Connect (OIDC). When enabled, authentication protects the web interface while
+keeping the API endpoints open for agent access.
 
 ### Authentication Modes
 
 The server operates in two modes:
 
-- **Without Authentication** (default): When OIDC is not configured, all web pages and API endpoints are accessible without authentication
-- **With OIDC Authentication**: When OIDC is configured, web pages require authentication, but API endpoints (`/v1/*`) remain open for agent access
+- **Without Authentication** (default): When OIDC is not configured, all web
+  pages and API endpoints are accessible without authentication
+- **With OIDC Authentication**: When OIDC is configured, web pages require
+  authentication, but API endpoints (`/v1/*`) remain open for agent access
 
 ### Web Interface Authentication (OIDC)
 
-To enable authentication for the web interface, configure the following environment variables:
+To enable authentication for the web interface, configure the following
+environment variables:
 
 | Variable | Description | Default | Required |
 |----------|-------------|---------|----------|
@@ -167,7 +172,8 @@ To enable authentication for the web interface, configure the following environm
 | `OIDC_SKIP_TLS_VERIFY` | Skip TLS certificate verification (for self-signed certificates) | `false` | No |
 
 ::: warning
-If both `OIDC_CLIENT_ID` and `OIDC_CLIENT_SECRET` are not provided, the server will run **without authentication**. All web pages will be publicly accessible.
+If both `OIDC_CLIENT_ID` and `OIDC_CLIENT_SECRET` are not provided, the server
+will run **without authentication**. All web pages will be publicly accessible.
 :::
 
 #### Provider Configuration Examples
@@ -240,15 +246,19 @@ OIDC_SKIP_TLS_VERIFY=false
 Users are automatically created on their first login. The system supports:
 
 - **Active/Inactive status**: Users can be deactivated by administrators
-- **Admin privileges**: First-time setup may require manual promotion of admin users in the database
+- **Admin privileges**: First-time setup may require manual promotion of admin
+  users in the database
 
 ### API Authentication
 
-The REST API endpoints (`/v1/*`) do **not** require authentication, even when OIDC is enabled. This design allows agents to send transaction data without managing OIDC tokens.
+The REST API endpoints (`/v1/*`) do **not** require authentication, even when
+OIDC is enabled. This design allows agents to send transaction data without
+managing OIDC tokens.
 
 #### Securing the API
 
-To protect the API endpoints, use a reverse proxy with basic authentication in front of the Txlog Server:
+To protect the API endpoints, use a reverse proxy with basic authentication in
+front of the Txlog Server:
 
 **Caddy Example**:
 
@@ -275,11 +285,13 @@ location /v1/ {
 }
 ```
 
-Configure the [agent](https://txlog.rda.run/docs/agent#configuration) with the username and password defined in your reverse proxy.
+Configure the [agent](https://txlog.rda.run/docs/agent#configuration) with the
+username and password defined in your reverse proxy.
 
 ## UI and API
 
-Once the server is running, you can access its interface at `http://<server-address>:8080`. From there, you can:
+Once the server is running, you can access its interface at
+`http://<server-address>:8080`. From there, you can:
 
 ### View all collected transaction logs
 
