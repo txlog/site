@@ -145,12 +145,137 @@ The Txlog Server can be configured using the following environment variables:
 
 ## Authentication
 
-Currently, the server does not support built-in authentication, although the
-agent does. To secure your server, you can use a reverse proxy with basic
-authentication (like [Caddy](https://caddyserver.com/) or
-[Nginx](https://www.nginx.com/)) in front of the Txlog Server. Then, configure
-the [agent](https://txlog.rda.run/docs/agent#configuration) with the appropriate
-username and password to match your proxy's authentication settings.
+The Txlog Server provides **optional** authentication support through OpenID Connect (OIDC). When enabled, authentication protects the web interface while keeping the API endpoints open for agent access.
+
+### Authentication Modes
+
+The server operates in two modes:
+
+- **Without Authentication** (default): When OIDC is not configured, all web pages and API endpoints are accessible without authentication
+- **With OIDC Authentication**: When OIDC is configured, web pages require authentication, but API endpoints (`/v1/*`) remain open for agent access
+
+### Web Interface Authentication (OIDC)
+
+To enable authentication for the web interface, configure the following environment variables:
+
+| Variable | Description | Default | Required |
+|----------|-------------|---------|----------|
+| `OIDC_CLIENT_ID` | OAuth2 client ID for your application | - | Yes |
+| `OIDC_CLIENT_SECRET` | OAuth2 client secret | - | Yes |
+| `OIDC_ISSUER_URL` | OIDC provider's issuer URL | `http://localhost:8090` | No |
+| `OIDC_REDIRECT_URL` | Redirect URI after authentication | `http://localhost:8080/auth/callback` | No |
+| `OIDC_SKIP_TLS_VERIFY` | Skip TLS certificate verification (for self-signed certificates) | `false` | No |
+
+::: warning
+If both `OIDC_CLIENT_ID` and `OIDC_CLIENT_SECRET` are not provided, the server will run **without authentication**. All web pages will be publicly accessible.
+:::
+
+#### Provider Configuration Examples
+
+::: code-group
+
+```bash [Pocket ID]
+# Pocket ID Configuration
+# Self-hosted OIDC provider: https://pocket-id.org
+OIDC_ISSUER_URL=https://pocketid.example.com
+OIDC_CLIENT_ID=your-client-id
+OIDC_CLIENT_SECRET=your-client-secret
+OIDC_REDIRECT_URL=https://txlog.example.com/auth/callback
+OIDC_SKIP_TLS_VERIFY=false
+```
+
+```bash [Google]
+# Google OAuth2 Configuration
+# Create credentials at: https://console.cloud.google.com/apis/credentials
+OIDC_ISSUER_URL=https://accounts.google.com
+OIDC_CLIENT_ID=your-client-id.apps.googleusercontent.com
+OIDC_CLIENT_SECRET=your-client-secret
+OIDC_REDIRECT_URL=https://txlog.example.com/auth/callback
+OIDC_SKIP_TLS_VERIFY=false
+```
+
+```bash [Microsoft Entra ID]
+# Microsoft Entra ID (Azure AD) Configuration
+# Register app at: https://portal.azure.com/#view/Microsoft_AAD_IAM/ActiveDirectoryMenuBlade/~/RegisteredApps
+OIDC_ISSUER_URL=https://login.microsoftonline.com/{tenant-id}/v2.0
+OIDC_CLIENT_ID=your-application-id
+OIDC_CLIENT_SECRET=your-client-secret
+OIDC_REDIRECT_URL=https://txlog.example.com/auth/callback
+OIDC_SKIP_TLS_VERIFY=false
+```
+
+```bash [Keycloak]
+# Keycloak Configuration
+OIDC_ISSUER_URL=https://keycloak.example.com/realms/{realm-name}
+OIDC_CLIENT_ID=txlog-client
+OIDC_CLIENT_SECRET=your-client-secret
+OIDC_REDIRECT_URL=https://txlog.example.com/auth/callback
+OIDC_SKIP_TLS_VERIFY=false
+```
+
+```bash [Auth0]
+# Auth0 Configuration
+# Create application at: https://manage.auth0.com/
+OIDC_ISSUER_URL=https://{your-domain}.auth0.com/
+OIDC_CLIENT_ID=your-client-id
+OIDC_CLIENT_SECRET=your-client-secret
+OIDC_REDIRECT_URL=https://txlog.example.com/auth/callback
+OIDC_SKIP_TLS_VERIFY=false
+```
+
+```bash [Okta]
+# Okta Configuration
+# Create app at: https://{your-domain}.okta.com/admin/apps
+OIDC_ISSUER_URL=https://{your-domain}.okta.com/oauth2/default
+OIDC_CLIENT_ID=your-client-id
+OIDC_CLIENT_SECRET=your-client-secret
+OIDC_REDIRECT_URL=https://txlog.example.com/auth/callback
+OIDC_SKIP_TLS_VERIFY=false
+```
+
+:::
+
+#### User Management
+
+Users are automatically created on their first login. The system supports:
+
+- **Active/Inactive status**: Users can be deactivated by administrators
+- **Admin privileges**: First-time setup may require manual promotion of admin users in the database
+
+### API Authentication
+
+The REST API endpoints (`/v1/*`) do **not** require authentication, even when OIDC is enabled. This design allows agents to send transaction data without managing OIDC tokens.
+
+#### Securing the API
+
+To protect the API endpoints, use a reverse proxy with basic authentication in front of the Txlog Server:
+
+**Caddy Example**:
+
+```caddyfile
+txlog.example.com {
+    # Protect API endpoints
+    @api path /v1/*
+    basicauth @api {
+        agent $2a$14$...hashed_password...
+    }
+
+    # Forward to Txlog Server
+    reverse_proxy localhost:8080
+}
+```
+
+**Nginx Example**:
+
+```nginx
+location /v1/ {
+    auth_basic "Txlog API";
+    auth_basic_user_file /etc/nginx/.htpasswd;
+    proxy_pass http://localhost:8080;
+}
+```
+
+Configure the [agent](https://txlog.rda.run/docs/agent#configuration) with the username and password defined in your reverse proxy.
 
 ## UI and API
 
