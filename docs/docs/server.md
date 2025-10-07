@@ -20,6 +20,8 @@ offering:
   history across your infrastructure
 - **OIDC Authentication**: Optional OpenID Connect authentication for web
   interface access
+- **LDAP Authentication**: Optional LDAP authentication for integration with
+  directory services
 - **API Key Authentication**: Secure API access for agent communication
 - **Automated Housekeeping**: Scheduled cleanup of old transaction data
 
@@ -61,12 +63,11 @@ The Txlog Server is distributed as a Docker container image available at
 ### Version Tags
 
 - `main` - Latest development version (may include breaking changes)
-- `v1.14.0` - Latest stable release (recommended for production)
 - `v1.x.x` - Specific version tags for pinned deployments
 
 ::: warning
 The `main` tag is under active development and may introduce breaking changes.
-For production use, always use a specific version tag like `v1.14.0`.
+For production use, always use a specific version tag.
 :::
 
 ### Quick Start with Docker
@@ -181,7 +182,7 @@ The Txlog Server is configured entirely through environment variables:
 | `GIN_MODE` | Gin framework mode | `release` | `debug`, `release` |
 | `PORT` | HTTP server port | `8080` | `8080` |
 
-### PostgreSQL Database
+### Database Configuration
 
 | Variable | Description | Required | Example |
 |----------|-------------|----------|---------|
@@ -209,21 +210,23 @@ The Txlog Server is configured entirely through environment variables:
 
 ## Authentication
 
-Txlog Server provides a dual authentication system designed to balance security
-with operational needs:
+Txlog Server provides a flexible authentication system designed to balance security
+with operational needs, supporting three authentication modes:
 
-- **Web Interface**: Optional OIDC authentication for human access
+- **Web Interface**: Optional OIDC or LDAP authentication for human access
 - **API Endpoints**: API Key authentication for agent communication
 
-### Web Interface Authentication (OIDC)
+### Web Interface Authentication
 
 ::: info Optional Feature
-OIDC authentication is completely optional. When not configured, the web
+Web authentication is completely optional. When not configured, the web
 interface is publicly accessible. This is useful for internal deployments where
 network security provides sufficient protection.
 :::
 
-#### Enabling OIDC
+The server supports two authentication providers for web access:
+
+#### OIDC Authentication (OpenID Connect)
 
 Configure these environment variables to enable OpenID Connect authentication:
 
@@ -295,9 +298,112 @@ OIDC_SKIP_TLS_VERIFY=false
 
 :::
 
+#### LDAP Authentication
+
+**Since v1.14.0**, Txlog Server supports LDAP authentication as an alternative
+or complement to OIDC. This allows integration with existing directory services
+like Active Directory, OpenLDAP, or FreeIPA.
+
+##### Basic Configuration
+
+| Variable | Description | Required | Example |
+|----------|-------------|----------|---------|
+| `LDAP_HOST` | LDAP server hostname | Yes | `ldap.example.com` |
+| `LDAP_PORT` | LDAP server port | No | `389` (LDAP), `636` (LDAPS) |
+| `LDAP_USE_TLS` | Enable TLS connection | No | `false` |
+| `LDAP_SKIP_TLS_VERIFY` | Skip TLS certificate verification (dev only) | No | `false` |
+| `LDAP_BASE_DN` | Base DN for user searches | Yes | `ou=users,dc=example,dc=com` |
+| `LDAP_USER_FILTER` | LDAP filter for finding users | No | `(uid=%s)` |
+| `LDAP_BIND_DN` | Service account DN (optional) | No | `cn=admin,dc=example,dc=com` |
+| `LDAP_BIND_PASSWORD` | Service account password (optional) | No | (password) |
+
+##### Group-Based Access Control
+
+At least one group must be configured for LDAP authentication to work:
+
+| Variable | Description | Example |
+|----------|-------------|---------|
+| `LDAP_ADMIN_GROUP` | DN of admin group (full access) | `cn=admins,ou=groups,dc=example,dc=com` |
+| `LDAP_VIEWER_GROUP` | DN of viewer group (read-only) | `cn=viewers,ou=groups,dc=example,dc=com` |
+| `LDAP_GROUP_FILTER` | LDAP filter for group membership | `(member=%s)` |
+
+::: code-group
+
+```bash [OpenLDAP]
+# OpenLDAP configuration
+LDAP_HOST=ldap.example.com
+LDAP_PORT=389
+LDAP_USE_TLS=false
+LDAP_BASE_DN=dc=example,dc=com
+LDAP_USER_FILTER=(uid=%s)
+LDAP_GROUP_FILTER=(member=%s)
+LDAP_ADMIN_GROUP=cn=admins,ou=groups,dc=example,dc=com
+LDAP_VIEWER_GROUP=cn=viewers,ou=groups,dc=example,dc=com
+# Optional service account (recommended)
+LDAP_BIND_DN=cn=admin,dc=example,dc=com
+LDAP_BIND_PASSWORD=your_bind_password
+```
+
+```bash [Active Directory]
+# Active Directory configuration
+LDAP_HOST=ad.example.com
+LDAP_PORT=636
+LDAP_USE_TLS=true
+LDAP_BASE_DN=DC=example,DC=com
+LDAP_USER_FILTER=(sAMAccountName=%s)
+LDAP_GROUP_FILTER=(member=%s)
+LDAP_ADMIN_GROUP=CN=Txlog Admins,OU=Groups,DC=example,DC=com
+LDAP_VIEWER_GROUP=CN=Txlog Viewers,OU=Groups,DC=example,DC=com
+# Service account required for AD
+LDAP_BIND_DN=CN=Service Account,OU=Service Accounts,DC=example,DC=com
+LDAP_BIND_PASSWORD=your_bind_password
+```
+
+```bash [FreeIPA]
+# FreeIPA configuration
+LDAP_HOST=ipa.example.com
+LDAP_PORT=389
+LDAP_USE_TLS=false
+LDAP_BASE_DN=dc=example,dc=com
+LDAP_USER_FILTER=(uid=%s)
+LDAP_GROUP_FILTER=(member=%s)
+LDAP_ADMIN_GROUP=cn=admins,cn=groups,cn=accounts,dc=example,dc=com
+LDAP_VIEWER_GROUP=cn=viewers,cn=groups,cn=accounts,dc=example,dc=com
+# Optional service account
+LDAP_BIND_DN=uid=txlog,cn=users,cn=accounts,dc=example,dc=com
+LDAP_BIND_PASSWORD=your_bind_password
+```
+
+:::
+
+::: tip Service Account
+`LDAP_BIND_DN` and `LDAP_BIND_PASSWORD` are **optional**. If not provided:
+
+- OpenLDAP: Uses anonymous bind (if enabled on server)
+- Active Directory: **Requires** a service account
+- FreeIPA: Can work with anonymous bind but service account recommended
+
+For production, always use a dedicated service account with read-only
+permissions.
+:::
+
+::: warning Security
+
+- Always use `LDAP_USE_TLS=true` in production
+- Never use `LDAP_SKIP_TLS_VERIFY=true` in production
+- Grant service accounts minimal permissions (read-only access to user and
+  group objects)
+
+:::
+
+##### Multiple Authentication Providers
+
+You can enable both OIDC and LDAP simultaneously. Users will see both login
+options on the authentication page.
+
 #### User Management
 
-When OIDC is enabled:
+When OIDC or LDAP authentication is enabled:
 
 - **Automatic User Creation**: Users are created automatically on their first
   login
@@ -306,6 +412,8 @@ When OIDC is enabled:
 - **Admin Panel**: Administrators can manage users via the `/admin` interface
 - **User Status**: Users can be activated/deactivated by administrators
 - **Admin Privileges**: Administrators can promote/demote other users
+- **LDAP Group Sync**: With LDAP, user roles are synchronized from directory
+  groups on each login
 
 ::: tip
 The admin panel at `/admin` is accessible even without OIDC authentication,
@@ -314,14 +422,14 @@ allowing database migration management and system configuration viewing.
 
 ### API Key Authentication
 
-**Since v1.14.0**, if you enable OIDC authentication, the REST API endpoints
-(`/v1/*`) require API key authentication. This provides secure access for agents
-while keeping management simple.
+**Since v1.14.0**, if you enable OIDC or LDAP authentication, the REST API
+endpoints (`/v1/*`) require API key authentication. This provides secure access
+for agents while keeping management simple.
 
 #### Creating API Keys
 
-1. Access the Admin Panel at `/admin` (requires admin privileges when OIDC is
-   enabled)
+1. Access the Admin Panel at `/admin` (requires admin privileges when OIDC or
+   LDAP is enabled)
 2. Navigate to the "API Keys" section
 3. Click "Create New API Key"
 4. Provide a description (e.g., "Production Agent Key")
@@ -574,6 +682,43 @@ Check:
 - Issuer URL is accessible from the server
 - Redirect URL matches your OIDC provider configuration
 - Client ID and secret are correct
+
+#### LDAP Authentication Not Working
+
+```text
+Error: Failed to authenticate with LDAP
+```
+
+Check:
+
+- LDAP host/port are correct and accessible
+- Base DN is correct for your directory structure
+- User filter matches your directory schema
+- Group filters and DNs are correct
+- Service account credentials are valid (if using)
+- User is member of at least one configured group (admin or viewer)
+
+Common LDAP errors:
+
+- **LDAP Result Code 32**: Base DN or group DN not found - verify your DN
+  structure
+- **LDAP Result Code 49**: Invalid credentials - check bind DN/password or user
+  credentials
+- **LDAP Result Code 50**: Insufficient permissions - service account needs read
+  access
+
+::: tip LDAP Troubleshooting
+Use the included `ldap-discovery.sh` script from the [server
+repository](https://github.com/txlog/server/tree/main/docs) to test your LDAP
+configuration:
+
+```bash
+./ldap-discovery.sh
+```
+
+The script helps you discover correct filter values and test authentication
+interactively.
+:::
 
 #### API Key Authentication Failed
 
