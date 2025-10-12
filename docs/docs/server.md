@@ -88,7 +88,7 @@ docker run -d -p 8080:8080 \
   -e CRON_RETENTION_EXPRESSION="0 2 * * *" \
   -e CRON_STATS_EXPRESSION="0 * * * *" \
   -e IGNORE_EMPTY_EXECUTION=true \
-  cr.rda.run/txlog/server:v1.14.0
+  cr.rda.run/txlog/server:v1.16.0
 ```
 
 ```yaml [Kubernetes]
@@ -108,7 +108,7 @@ spec:
     spec:
       containers:
       - name: txlog-server
-        image: cr.rda.run/txlog/server:v1.14.0
+        image: cr.rda.run/txlog/server:v1.16.0
         ports:
         - containerPort: 8080
         livenessProbe:
@@ -210,11 +210,12 @@ The Txlog Server is configured entirely through environment variables:
 
 ## Authentication
 
-Txlog Server provides a flexible authentication system designed to balance security
-with operational needs, supporting three authentication modes:
+Txlog Server supports three authentication modes:
 
-- **Web Interface**: Optional OIDC or LDAP authentication for human access
-- **API Endpoints**: API Key authentication for agent communication
+- **No Authentication (Default)**: If neither OIDC nor LDAP is configured, the server runs without authentication.
+- **OIDC Authentication**: Configure OIDC environment variables to enable OpenID Connect authentication.
+- **LDAP Authentication**: Configure LDAP environment variables to enable LDAP authentication.
+- **Both OIDC and LDAP**: Both can be enabled simultaneously, allowing users to choose their preferred authentication method.
 
 ### Web Interface Authentication
 
