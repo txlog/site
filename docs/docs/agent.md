@@ -53,7 +53,7 @@ The recommended installation method is via the RPM repository:
 
 ```bash
 # Add the RPM repository
-sudo dnf localinstall -y https://rpm.rda.run/rpm-rda-run-1.0-1.noarch.rpm
+sudo dnf localinstall -y https://rpm.rda.run/rpm-rda-run-1.3.0-1.noarch.rpm
 
 # Install the agent
 sudo dnf install -y txlog
