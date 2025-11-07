@@ -14,8 +14,8 @@ offering:
 
 - **Transaction Tracking**: Records all package installations, updates, and
   removals from connected agents
-- **Asset Management**: Monitors all systems (machines) sending transaction data
-- **Restart Detection**: Identifies systems that require restarts after updates
+- **Asset Management**: Centralized tracking of server identity and lifecycle with automatic detection of replaced servers
+- **Restart Detection**: Identifies systems that require restarts after updates with detailed reasoning
 - **Package Statistics**: Provides insights into package distribution and update
   history across your infrastructure
 - **OIDC Authentication**: Optional OpenID Connect authentication for web
@@ -24,6 +24,7 @@ offering:
   directory services
 - **API Key Authentication**: Secure API access for agent communication
 - **Automated Housekeeping**: Scheduled cleanup of old transaction data
+- **AI-Powered Reports**: Generate monthly package update reports with automatic CVE research using ChatGPT, Claude, or Gemini
 
 ## System Requirements
 
@@ -38,6 +39,13 @@ Create a blank database:
 ```sql
 CREATE DATABASE "txlog" WITH ENCODING = 'UTF8';
 ```
+
+::: tip Database Schema Documentation
+The database schema includes comprehensive table and column comments visible in
+database tools like pgAdmin or DBeaver. This self-documenting schema helps with
+development, maintenance, and troubleshooting. See the [server
+repository](https://github.com/txlog/server) for detailed schema information.
+:::
 
 ### Supported Platforms
 
@@ -87,8 +95,7 @@ docker run -d -p 8080:8080 \
   -e CRON_RETENTION_DAYS=7 \
   -e CRON_RETENTION_EXPRESSION="0 2 * * *" \
   -e CRON_STATS_EXPRESSION="0 * * * *" \
-  -e IGNORE_EMPTY_EXECUTION=true \
-  cr.rda.run/txlog/server:v1.16.0
+  cr.rda.run/txlog/server:v1.18.0
 ```
 
 ```yaml [Kubernetes]
@@ -108,7 +115,7 @@ spec:
     spec:
       containers:
       - name: txlog-server
-        image: cr.rda.run/txlog/server:v1.16.0
+        image: cr.rda.run/txlog/server:v1.18.0
         ports:
         - containerPort: 8080
         livenessProbe:
@@ -149,8 +156,6 @@ spec:
           value: "0 2 * * *"
         - name: CRON_STATS_EXPRESSION
           value: "0 * * * *"
-        - name: IGNORE_EMPTY_EXECUTION
-          value: "true"
 ```
 
 :::
@@ -200,7 +205,6 @@ The Txlog Server is configured entirely through environment variables:
 | `CRON_RETENTION_DAYS` | Days to keep transaction data | `7` | `30` |
 | `CRON_RETENTION_EXPRESSION` | Cron schedule for cleanup job | `0 2 * * *` | `0 2 * * *` (2 AM daily) |
 | `CRON_STATS_EXPRESSION` | Cron schedule for statistics updates | `0 * * * *` | `0 * * * *` (hourly) |
-| `IGNORE_EMPTY_EXECUTION` | Skip empty transaction executions | `false` | `true`, `false` |
 
 ### Version Check
 
@@ -556,6 +560,40 @@ Track update rollout over time at `/package-progression`:
 - **Historical Data**: View up to 15 weeks of update history
 - **Update Velocity**: Monitor how quickly packages are being updated across
   infrastructure
+- **AI-Powered Reports**: Generate monthly package update reports with automatic CVE research using ChatGPT, Claude, or Gemini
+
+### AI Report Generator
+
+Generate comprehensive monthly package update reports with AI assistance:
+
+- **Month/Year Selection**: Choose specific months to analyze
+- **Automatic CVE Research**: AI prompts include instructions to research CVEs using Red Hat errata
+- **Multi-AI Support**: Compatible with ChatGPT, Claude, and Gemini
+- **Priority Focus**: Reports prioritize affected servers over transaction counts
+- **Copy to Clipboard**: One-click prompt copying for AI assistants
+
+The AI report generator creates detailed summaries of package updates, security patches, and infrastructure impact for executive and technical stakeholders.
+
+## Assets Management
+
+The server includes comprehensive asset lifecycle management:
+
+### Asset Tracking Features
+
+- **Centralized Identity**: Track servers by hostname and unique machine ID
+- **Replacement Detection**: Automatically detect when servers are replaced (same hostname, different machine ID)
+- **Activity Monitoring**: Real-time status indicators showing when servers last reported
+- **Restart Tracking**: Monitor which servers require restart with detailed reasoning
+- **Active/Inactive Status**: Filter and manage active vs replaced servers
+- **Complete History**: Preserve full transaction history even for replaced servers
+
+### Asset Status Indicators
+
+Assets display time-based visual indicators:
+
+- **Green**: Active within the last hour
+- **Yellow**: Active within the last 24 hours  
+- **Red**: No activity for over 24 hours
 
 ## REST API
 
@@ -590,7 +628,16 @@ curl -X POST \
 # Get assets requiring restart
 curl -H "X-API-Key: your-api-key" \
   https://txlog.example.com/v1/assets/requiring-restart
+
+# Get assets running a specific package version (v1.18.0+)
+curl -H "X-API-Key: your-api-key" \
+  https://txlog.example.com/v1/packages/kernel/5.14.0/362.18.1.el9_3.x86_64/assets
 ```
+
+::: info API Endpoint Changes in v1.18.0
+Package asset endpoints now use the format `/packages/:name/:version/:release/assets` 
+for precise package identification with both version and release fields.
+:::
 
 ## Scheduled Tasks
 
@@ -611,6 +658,12 @@ Controlled by `CRON_STATS_EXPRESSION` (default: `0 * * * *` - hourly):
 - Updates aggregated package statistics
 - Recalculates distribution metrics
 - Refreshes dashboard data
+
+::: info Real-Time Asset Counts (v1.18.0+)
+Asset counts are now computed in real-time instead of being cached in the statistics
+table. This provides more accurate counts and better reflects the current state of
+your infrastructure.
+:::
 
 ## Deployment Best Practices
 

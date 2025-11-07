@@ -70,8 +70,8 @@ txlog version
 You should see output similar to:
 
 ```text
-Txlog Agent v1.7.0
-Txlog Server v1.14.0
+Txlog Agent v1.8.0
+Txlog Server v1.18.0
 ```
 
 ## Configuration
