@@ -152,9 +152,10 @@ terminals that don't support colors. Example: `NO_COLOR=1 txlog build`
 
 #### API Key Authentication (Recommended)
 
-::: tip Server Version Requirement API key authentication requires **Txlog
-Server 1.14.0 or later**. The agent automatically validates server compatibility
-on startup. :::
+::: tip Server Version Requirement
+API key authentication requires **Txlog Server 1.14.0 or later**. The agent
+automatically validates server compatibility on startup.
+:::
 
 To use API key authentication:
 
@@ -324,9 +325,11 @@ Add to root's crontab:
 sudo crontab -e
 ```
 
-::: tip Best Practice Run the agent regularly but not too frequently. Hourly or
-daily execution is typically sufficient for most environments. The agent is
-smart enough to only send new transactions. :::
+::: tip Best Practice
+Run the agent regularly but not too frequently. Hourly or daily execution is
+typically sufficient for most environments. The agent is smart enough to only
+send new transactions.
+:::
 
 ## How It Works
 
