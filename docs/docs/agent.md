@@ -70,8 +70,14 @@ txlog version
 You should see output similar to:
 
 ```text
-Txlog Agent v1.8.0
-Txlog Server v1.18.0
+
+============================================================
+📦 Txlog Agent:  v1.9.0
+🖥️ Txlog Server: v1.18.0
+============================================================
+
+✓ You are running the latest version!
+
 ```
 
 ## Configuration
@@ -132,16 +138,23 @@ server:
 | `username` | string | No* | Username for basic authentication (legacy) |
 | `password` | string | No* | Password for basic authentication (legacy) |
 
-Either `api_key` OR `username`+`password` must be configured if the server requires authentication.
+Either `api_key` OR `username`+`password` must be configured if the server
+requires authentication.`
+
+### Environment Variables
+
+- **NO_COLOR**: When set to any value (even an empty string), disables colored
+output and emoji icons in all txlog commands. This follows the standard defined
+at <https://no-color.org>. Useful for CI/CD pipelines, logging to files, or
+terminals that don't support colors. Example: `NO_COLOR=1 txlog build`
 
 ### Authentication Methods
 
 #### API Key Authentication (Recommended)
 
-::: tip Server Version Requirement
-API key authentication requires **Txlog Server 1.14.0 or later**. The agent
-automatically validates server compatibility on startup.
-:::
+::: tip Server Version Requirement API key authentication requires **Txlog
+Server 1.14.0 or later**. The agent automatically validates server compatibility
+on startup. :::
 
 To use API key authentication:
 
@@ -160,9 +173,8 @@ To use API key authentication:
 
 For older server versions or specific requirements.
 
-::: warning Security Note
-Store credentials securely. The configuration file should have restricted
-permissions:
+::: warning Security Note Store credentials securely. The configuration file
+should have restricted permissions:
 
 ```bash
 sudo chmod 600 /etc/txlog.yaml
@@ -198,14 +210,44 @@ This command:
 **Example output:**
 
 ```text
-Compiling host identification for server01.example.com
-Retrieving saved transactions
-Compiling transaction data
-Transaction #145 sent.
-Transaction #146 sent.
-Transaction #147 sent.
-Done. 147 transactions processed, 3 transactions sent to server.
+🔍 Compiling host identification for server01.example.com
+   Machine ID: d43a86fe690e4fd6b9606eb8efbdfa51
+
+📥 Retrieving saved transactions...
+   Found 70 saved transactions on server
+
+⚙️  Compiling transaction data...
+   ✓ Transaction #71 sent successfully
+
+============================================================
+✓ Build completed successfully!
+   Transactions processed: 71
+   Transactions sent:      1
+============================================================
+
 ```
+
+### The `verify` command
+
+This command allows you to verify that all local DNF transaction data has been
+properly replicated to the Txlog server. This is useful for ensuring data
+integrity and identifying any synchronization issues.
+
+The verification process checks:
+
+1. **Missing Transactions:** Identifies transactions that exist in the local DNF
+  history but have not been sent to the server. These transactions may have
+  been skipped during a previous txlog build execution due to errors or
+  interruptions.
+1. **Transaction Items Integrity:** For each transaction that exists on the server,
+   verifies that all package items (installations, upgrades, removals) are
+   correctly recorded. The verification compares:
+   - Package names, versions, releases, epochs, and architectures
+   - Action types (Install, Upgrade, Remove, etc.)
+   - Repository information
+
+After running `txlog verify`, if any issues are detected, you can delete the
+asset data on server and run `txlog build` to synchronize the data again.
 
 ### The `version` command
 
@@ -218,8 +260,14 @@ txlog version
 **Example output:**
 
 ```text
-Txlog Agent v1.7.0
-Txlog Server v1.14.0
+
+============================================================
+📦 Txlog Agent:  v1.9.0
+🖥️ Txlog Server: v1.18.0
+============================================================
+
+✓ You are running the latest version!
+
 ```
 
 If a newer version is available (and `check_version: true`):
@@ -275,11 +323,9 @@ Add to root's crontab:
 sudo crontab -e
 ```
 
-::: tip Best Practice
-Run the agent regularly but not too frequently. Hourly or daily execution is
-typically sufficient for most environments. The agent is smart enough to only
-send new transactions.
-:::
+::: tip Best Practice Run the agent regularly but not too frequently. Hourly or
+daily execution is typically sufficient for most environments. The agent is
+smart enough to only send new transactions. :::
 
 ## How It Works
 
