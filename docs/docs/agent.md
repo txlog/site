@@ -173,8 +173,9 @@ To use API key authentication:
 
 For older server versions or specific requirements.
 
-::: warning Security Note Store credentials securely. The configuration file
-should have restricted permissions:
+::: warning Security Note
+Store credentials securely. The configuration file should have restricted
+permissions:
 
 ```bash
 sudo chmod 600 /etc/txlog.yaml
