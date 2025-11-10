@@ -326,9 +326,9 @@ sudo crontab -e
 ```
 
 ::: tip Best Practice
-Run the agent regularly but not too frequently. Hourly or daily execution is
-typically sufficient for most environments. The agent is smart enough to only
-send new transactions.
+Run the agent regularly but not too frequently. Daily executions is typically
+sufficient for most environments. The agent is smart enough to only send new
+transactions.
 :::
 
 ## How It Works
