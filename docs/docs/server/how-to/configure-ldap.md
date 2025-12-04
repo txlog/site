@@ -51,9 +51,9 @@ This guide explains how to connect Txlog Server to an LDAP directory (like Activ
 For detailed information on filters, error codes, and specific setups (like Active Directory), refer to the detailed
 guides in the `docs/` folder:
 
-- [LDAP Authentication Deep Dive](../LDAP_AUTHENTICATION.md)
-- [LDAP Filter Guide](../LDAP_FILTERS_QUICK.md)
-- [Service Account FAQ](../LDAP_SERVICE_ACCOUNT_FAQ.md)
+- [LDAP Authentication Deep Dive](../explanation/ldap-deep-dive.md)
+- [LDAP Filter Guide](../reference/ldap-filters.md)
+- [Service Account FAQ](../explanation/ldap-service-account-faq.md)
 
 ## Troubleshooting
 

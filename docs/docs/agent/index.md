@@ -15,7 +15,7 @@ The documentation is organized into four sections:
 * **[Getting Started](tutorials/getting_started.md)**: A hands-on guide to
     installing, configuring, and running the agent for the first time.
 
-### 2. [How-to Guides](how-to/)
+### 2. [How-to Guides](how-to/configure_authentication.md)
 
 *Task-oriented guides for specific goals.*
 
@@ -28,7 +28,7 @@ The documentation is organized into four sections:
 * **[Secure Configuration](how-to/secure_configuration.md)**: Protect your
     credentials.
 
-### 3. [Reference](reference/)
+### 3. [Reference](reference/cli_commands.md)
 
 *Information-oriented technical descriptions.*
 
@@ -38,7 +38,7 @@ The documentation is organized into four sections:
 * **[Environment Variables](reference/environment_variables.md)**: `NO_COLOR`
     and others.
 
-### 4. [Explanation](explanation/)
+### 4. [Explanation](explanation/architecture_overview.md)
 
 *Understanding-oriented background knowledge.*
 

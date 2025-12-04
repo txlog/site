@@ -10,7 +10,7 @@ efficiently handling incoming information from multiple agent instances
 throughout the network.
 
 To install and configure, follow the instructions on the [Server Installation
-and Configuration](server) page.
+and Configuration](server/index.md) page.
 
 ## Agent Version
 
@@ -20,7 +20,7 @@ from the DNF (Dandified YUM) package manager, then securely transmits this
 information to the Txlog server for centralized storage and management.
 
 To install and configure, follow the instructions on the [Agent Installation and
-Configuration](agent) page.
+Configuration](agent/index.md) page.
 
 ## Data Flow
 

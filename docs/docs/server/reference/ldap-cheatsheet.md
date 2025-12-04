@@ -183,6 +183,6 @@ docker run -d -p 8080:8080 \
 
 ## Documentation Links
 
-- Full Guide: [LDAP_AUTHENTICATION.md](LDAP_AUTHENTICATION.md)
-- Implementation Details: [LDAP_IMPLEMENTATION_SUMMARY.md](LDAP_IMPLEMENTATION_SUMMARY.md)
-- General Setup: [README.md](README.md)
+- Full Guide: [LDAP_AUTHENTICATION.md](../explanation/ldap-deep-dive.md)
+- Implementation Details: [LDAP_IMPLEMENTATION_SUMMARY.md](../explanation/ldap-implementation-details.md)
+- General Setup: [README.md](../index.md)

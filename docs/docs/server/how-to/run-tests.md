@@ -50,4 +50,4 @@ Integration tests in the `tests/` directory simulate full user scenarios. They a
 go test ./tests -v
 ```
 
-For more details on the testing strategy, see [TESTING.md](../TESTING.md).
+For more details on the testing strategy, see [TESTING.md](../explanation/testing-strategy.md).
