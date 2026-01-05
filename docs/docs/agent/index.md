@@ -26,6 +26,8 @@ txlog build
 
 * **[Getting Started](tutorials/getting_started.md)**: A hands-on guide to
     installing, configuring, and running the agent for the first time.
+* **[MCP Getting Started](tutorials/mcp_getting_started.md)**: Set up the MCP
+    server to use AI assistants with your infrastructure.
 
 ## 2. [How-to Guides](how-to/configure_authentication.md)
 
@@ -39,6 +41,8 @@ txlog build
     pipelines with `NO_COLOR`.
 * **[Secure Configuration](how-to/secure_configuration.md)**: Protect your
     credentials.
+* **[Configure MCP with SSE](how-to/configure_mcp_sse.md)**: Run the MCP server
+    with SSE transport for web clients.
 
 ## 3. [Reference](reference/cli_commands.md)
 
@@ -46,6 +50,8 @@ txlog build
 
 * **[CLI Commands](reference/cli_commands.md)**: `build`, `verify`,
     `version`.
+* **[MCP Tools](reference/mcp_tools.md)**: Available tools and prompts for AI
+    assistants.
 * **[Configuration](reference/configuration.md)**: `txlog.yaml` parameters.
 * **[Environment Variables](reference/environment_variables.md)**: `NO_COLOR`
     and others.
@@ -60,6 +66,8 @@ txlog build
     behind the sync process.
 * **[Design Choices](explanation/design_choices.md)**: Why we chose Go,
     Cobra, and Regex.
+* **[MCP Integration](explanation/mcp_integration.md)**: How and why the Model
+    Context Protocol was integrated.
 
 ## Quick Links
 
