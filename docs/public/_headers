@@ -1,2 +1,2 @@
 /*
-  Content-Security-Policy: default-src 'self' 'unsafe-inline'; img-src data: 'self';
+  Content-Security-Policy: default-src 'self' 'unsafe-inline'; img-src data: 'self'; frame-ancestors 'self'; form-action 'self';
