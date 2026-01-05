@@ -1,17 +1,39 @@
 # Txlog Server Documentation
 
-This documentation is divided into five types of guides:
+The Txlog Server is the core component of the platform, responsible for managing
+authentication, persisting transaction logs, and exposing the REST API used by
+agents and user interfaces. It orchestrates communication between services,
+ensuring data integrity and enforcing configured retention and security
+policies.
+
+## TL;DR
+
+```sql
+-- Create the database
+CREATE DATABASE txlog;
+```
+
+```bash
+# Run the server
+docker run -d --name txlog-server \
+  -e PGSQL_HOST=db.example.com \
+  -e PGSQL_USER=txlog \
+  -e PGSQL_PASSWORD=txlog \
+  -e PGSQL_DB=txlog \
+  -p 8080:8080 \
+  ghcr.io/txlog/server:main
+```
 
 ## 1. Tutorials
 
-*Start here if you are new to the project.*
+*Learning-oriented lessons for beginners.*
 
 - **[Getting Started](tutorials/getting-started.md)**: Set up the server locally with Docker.
 - **[Your First API Request](tutorials/first-api-request.md)**: Learn how to interact with the API.
 
 ## 2. How-to Guides
 
-*Step-by-step guides to achieve specific goals.*
+*Task-oriented guides for specific goals.*
 
 ### Authentication & Security
 
@@ -34,7 +56,7 @@ This documentation is divided into five types of guides:
 
 ## 3. Reference
 
-*Technical descriptions and specifications.*
+*Information-oriented technical descriptions.*
 
 ### System
 
@@ -50,7 +72,7 @@ This documentation is divided into five types of guides:
 
 ## 4. Explanation
 
-*Background knowledge and design decisions.*
+*Understanding-oriented background knowledge.*
 
 ### Architecture
 
@@ -64,7 +86,7 @@ This documentation is divided into five types of guides:
 - **[LDAP Service Accounts FAQ](explanation/ldap-service-account-faq.md)**: Best practices for bind accounts.
 - **[Testing Strategy](explanation/testing-strategy.md)**: Overview of the test suite and coverage goals.
 
-  ## 5. API Documentation
+## 5. API Documentation
 
 When the server is running, interactive API documentation is available at:
 `http://localhost:8080/swagger/index.html`

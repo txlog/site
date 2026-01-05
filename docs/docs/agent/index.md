@@ -1,21 +1,33 @@
 # Txlog Agent Documentation
 
-Welcome to the documentation for the Txlog Agent. This agent compiles
-transactional data from your RPM-based system and sends it to a central server
-for monitoring and analytics.
+The Txlog Agent is a specialized utility designed to compile transactional data
+from RPM-based systems and securely transmit it to a centralized server. By
+automating the collection and reporting of system changes, it enables
+comprehensive monitoring and analytics, providing administrators with a unified
+view of their infrastructure's state and history.
 
-## 📚 Documentation Structure
+## TL;DR
 
-The documentation is organized into four sections:
+```bash
+# Install
+sudo dnf localinstall -y https://rpm.rda.run/repo.rpm
+sudo dnf install -y txlog
 
-### 1. [Tutorials](tutorials/getting_started.md)
+# Configure (update server URL)
+sudo nano /etc/txlog.yaml
+
+# Run
+txlog build
+```
+
+## 1. [Tutorials](tutorials/getting_started.md)
 
 *Learning-oriented lessons for beginners.*
 
 * **[Getting Started](tutorials/getting_started.md)**: A hands-on guide to
     installing, configuring, and running the agent for the first time.
 
-### 2. [How-to Guides](how-to/configure_authentication.md)
+## 2. [How-to Guides](how-to/configure_authentication.md)
 
 *Task-oriented guides for specific goals.*
 
@@ -28,7 +40,7 @@ The documentation is organized into four sections:
 * **[Secure Configuration](how-to/secure_configuration.md)**: Protect your
     credentials.
 
-### 3. [Reference](reference/cli_commands.md)
+## 3. [Reference](reference/cli_commands.md)
 
 *Information-oriented technical descriptions.*
 
@@ -38,7 +50,7 @@ The documentation is organized into four sections:
 * **[Environment Variables](reference/environment_variables.md)**: `NO_COLOR`
     and others.
 
-### 4. [Explanation](explanation/architecture_overview.md)
+## 4. [Explanation](explanation/architecture_overview.md)
 
 *Understanding-oriented background knowledge.*
 
