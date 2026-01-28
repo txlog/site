@@ -12,6 +12,7 @@ the [txlog.rda.run](https://txlog.rda.run) website.
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
 \. "$HOME/.nvm/nvm.sh"
 nvm install 24
+npm add -D vitepress@next
 ```
 
 ### 1. Create GitHub Personal Access Token
