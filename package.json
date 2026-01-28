@@ -1,7 +1,7 @@
 {
   "devDependencies": {
     "patch-package": "^8.0.1",
-    "vitepress": "^1.6.4"
+    "vitepress": "^2.0.0-alpha.15"
   },
   "scripts": {
     "docs:dev": "vitepress dev docs",
