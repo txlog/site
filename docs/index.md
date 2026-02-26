@@ -10,7 +10,7 @@ hero:
     alt: The Logbook
   actions:
     - theme: brand
-      text: Quickstart
+      text: Get Started
       link: /docs
 
 features:
