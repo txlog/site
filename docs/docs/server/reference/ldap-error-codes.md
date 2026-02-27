@@ -2,9 +2,28 @@
 
 ## LDAP Result Code 32: No Such Object
 
+### TL;DR
+
+**Always check:**
+
+1. ✅ `LDAP_BASE_DN` - The starting point for searches.
+2. ✅ `LDAP_BIND_DN` - The service account (if used).
+3. ✅ `LDAP_ADMIN_GROUP` - The administrators group.
+4. ✅ `LDAP_VIEWER_GROUP` - The viewers group.
+
+**Use tools:**
+
+- `./ldap-discovery.sh` - Interactive discovery.
+- `ldapsearch` - Manual tests.
+- `LOG_LEVEL=DEBUG` - Detailed logs.
+
+🎯 In most cases, error 32 is caused by an **Incorrect Base DN**!
+
 ### 🔍 What does it mean?
 
-The error **"LDAP Result Code 32: No Such Object"** means that the LDAP server **could not find the object** (user, group, or DN) you are trying to access. It is like looking for a file that does not exist in a directory.
+The error **"LDAP Result Code 32: No Such Object"** means that the LDAP server
+**could not find the object** (user, group, or DN) you are trying to access. It
+is like looking for a file that does not exist in a directory.
 
 ### 📍 Where Can It Occur?
 
@@ -20,7 +39,8 @@ LDAP_BASE_DN=ou=users,dc=example,dc=com
 LDAP_BASE_DN=dc=example,dc=com
 ```
 
-**Problem:** The `LDAP_BASE_DN` is pointing to an OU that does not exist or is incorrect.
+**Problem:** The `LDAP_BASE_DN` is pointing to an OU that does not exist or is
+incorrect.
 
 **How to Verify:**
 
@@ -212,31 +232,31 @@ Use `ldapsearch` or the `ldap-discovery.sh` script:
 
 When encountering **"LDAP Result Code 32"**, check:
 
-- [ ] **LDAP_BASE_DN** exists and is accessible?
+- **LDAP_BASE_DN** exists and is accessible?
 
   ```bash
   ldapsearch -H ldap://... -x -D "..." -W -b "dc=example,dc=com" -s base "(objectClass=*)"
   ```
 
-- [ ] **LDAP_BIND_DN** exists (if configured)?
+- **LDAP_BIND_DN** exists (if configured)?
 
   ```bash
   ldapsearch -H ldap://... -x -D "cn=readonly,dc=example,dc=com" -W -b "dc=example,dc=com" -s base "(objectClass=*)"
   ```
 
-- [ ] **LDAP_ADMIN_GROUP** exists?
+- **LDAP_ADMIN_GROUP** exists?
 
   ```bash
   ldapsearch -H ldap://... -x -D "..." -W -b "cn=admins,ou=groups,dc=example,dc=com" -s base "(objectClass=*)"
   ```
 
-- [ ] **LDAP_VIEWER_GROUP** exists (if configured)?
+- **LDAP_VIEWER_GROUP** exists (if configured)?
 
   ```bash
   ldapsearch -H ldap://... -x -D "..." -W -b "cn=viewers,ou=groups,dc=example,dc=com" -s base "(objectClass=*)"
   ```
 
-- [ ] Users are within the **LDAP_BASE_DN**?
+- Users are within the **LDAP_BASE_DN**?
 
   ```bash
   ldapsearch -H ldap://... -x -D "..." -W -b "dc=example,dc=com" "(uid=user)"
@@ -313,7 +333,8 @@ ldapsearch -H ldap://server:389 -x \
 
 ### Code 50: Insufficient Access Rights
 
-**What it means:** The account does not have permission to perform the operation.
+**What it means:** The account does not have permission to perform the
+operation.
 
 **Solution:** The service account needs:
 
@@ -410,7 +431,7 @@ make run
 ## 📊 LDAP Codes Summary Table
 
 | Code | Name | Meaning | Common Solution |
-|------|------|---------|-----------------|
+| ---- | ---- | ------- | --------------- |
 | 0 | Success | Operation successful | N/A |
 | 32 | No Such Object | DN does not exist | Check DNs in .env |
 | 34 | Invalid DN Syntax | Incorrect DN format | Check commas and format |
@@ -464,24 +485,3 @@ ldapsearch -H ldap://server:389 \
 2. ✅ Enable `LOG_LEVEL=DEBUG` to see details.
 3. ✅ Test each DN manually with `ldapsearch`.
 4. ✅ Consult `LDAP_FILTER_DISCOVERY.md` for a complete guide.
-
----
-
-## ✨ Summary
-
-**"LDAP Result Code 32: No Such Object"** = **DN does not exist**
-
-**Always check:**
-
-1. ✅ `LDAP_BASE_DN` - The starting point for searches.
-2. ✅ `LDAP_BIND_DN` - The service account (if used).
-3. ✅ `LDAP_ADMIN_GROUP` - The administrators group.
-4. ✅ `LDAP_VIEWER_GROUP` - The viewers group.
-
-**Use tools:**
-
-- `./ldap-discovery.sh` - Interactive discovery.
-- `ldapsearch` - Manual tests.
-- `LOG_LEVEL=DEBUG` - Detailed logs.
-
-🎯 In most cases, error 32 is caused by an **Incorrect Base DN**!

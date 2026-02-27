@@ -1,11 +1,13 @@
 # Testing Guide for Txlog Server
 
-This document describes the test suite for the Txlog Server asset management system.
+This document describes the test suite for the Txlog Server asset management
+system.
 
 ## Overview
 
-The test suite covers the complete asset management lifecycle introduced in the v2 branch,
-including asset creation, updates, replacements, and deactivation logic.
+The test suite covers the complete asset management lifecycle introduced in the
+v2 branch, including asset creation, updates, replacements, and deactivation
+logic.
 
 ## Test Categories
 
@@ -15,7 +17,8 @@ Tests the core `AssetManager` business logic:
 
 - **Asset Creation**: Creating new assets with initial state
 - **Asset Updates**: Updating existing assets' `last_seen` timestamp
-- **Asset Replacement**: Deactivating old assets when hostname reports with new `machine_id`
+- **Asset Replacement**: Deactivating old assets when hostname reports with new
+  `machine_id`
 - **Asset Reactivation**: Reactivating previously inactive assets
 - **Asset Queries**: Retrieving active assets by hostname or `machine_id`
 
@@ -286,21 +289,3 @@ Tests are designed to work in CI/CD pipelines:
 
 - Ensure template files exist in `templates/` directory
 - Run tests from repository root directory
-
-## Future Improvements
-
-- [ ] Add benchmarks for query performance
-- [ ] Add concurrent access stress tests
-- [ ] Mock database for faster unit tests
-- [ ] Add API endpoint tests with `httptest.Server`
-- [ ] Add property-based testing for edge cases
-
-## Contributing
-
-When adding new features:
-
-1. Write tests first (TDD approach)
-2. Use unique test data prefixes
-3. Clean up in `defer` statements
-4. Skip gracefully if dependencies unavailable
-5. Document complex test scenarios

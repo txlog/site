@@ -1,6 +1,7 @@
 # Discovering LDAP Filters for Your Server
 
-This guide helps you discover the correct values for `LDAP_USER_FILTER` and `LDAP_GROUP_FILTER` in your specific LDAP environment.
+This guide helps you discover the correct values for `LDAP_USER_FILTER` and
+`LDAP_GROUP_FILTER` in your specific LDAP environment.
 
 ## Index
 
@@ -31,7 +32,8 @@ brew install openldap
 
 ### Windows
 
-- Download and install **Apache Directory Studio** (GUI): <https://directory.apache.org/studio/>
+- Download and install **Apache Directory Studio** (GUI):
+  <https://directory.apache.org/studio/>
 - Or use **ldp.exe** (already included in Windows Server)
 
 ---
@@ -347,9 +349,11 @@ Based on member attribute identified in **Step 4.3**:
 | `uniqueMember` | `(uniqueMember=%s)` | groupOfUniqueNames |
 | `memberUid` | `(memberUid=%s)` | posixGroup |
 
-**The `%s` will be replaced by the user's full DN** (e.g., `uid=john.doe,ou=users,dc=example,dc=com`)
+**The `%s` will be replaced by the user's full DN** (e.g.,
+`uid=john.doe,ou=users,dc=example,dc=com`)
 
-**EXCEPTION:** For `posixGroup` with `memberUid`, Txlog Server needs to extract only the `uid` from the user's DN.
+**EXCEPTION:** For `posixGroup` with `memberUid`, Txlog Server needs to extract
+only the `uid` from the user's DN.
 
 ---
 
@@ -379,7 +383,9 @@ LDAP_USER_FILTER=(uid=%s)
 LDAP_GROUP_FILTER=(memberUid=%s)
 ```
 
-**⚠️ IMPORTANT:** For posixGroup, you need to modify Txlog Server code to extract only the `uid` from the DN before doing the group search. Currently, it passes the full DN.
+**⚠️ IMPORTANT:** For posixGroup, you need to modify Txlog Server code to
+extract only the `uid` from the DN before doing the group search. Currently, it
+passes the full DN.
 
 ### Active Directory
 
@@ -491,14 +497,16 @@ LDAP_GROUP_FILTER=(&(objectClass=groupOfNames)(member=%s))
 
 ### Error: "not a member of any authorized group"
 
-1. Verify if `LDAP_ADMIN_GROUP` or `LDAP_VIEWER_GROUP` is correct (must be full group DN).
+1. Verify if `LDAP_ADMIN_GROUP` or `LDAP_VIEWER_GROUP` is correct (must be full
+   group DN).
 2. Test `LDAP_GROUP_FILTER` manually with `ldapsearch`.
 3. Verify if user is actually a member of the group in LDAP.
 
 ### Error: "failed to connect to LDAP"
 
 1. Verify if host and port are correct.
-2. Test connectivity: `telnet ldap-server 389` or `openssl s_client -connect ldap-server:636`.
+2. Test connectivity: `telnet ldap-server 389` or `openssl s_client -connect
+   ldap-server:636`.
 3. Verify firewall and network rules.
 
 ### Error: "failed to bind with service account"
@@ -512,7 +520,8 @@ LDAP_GROUP_FILTER=(&(objectClass=groupOfNames)(member=%s))
 ## Additional Resources
 
 - **OpenLDAP Documentation**: <https://www.openldap.org/doc/>
-- **Active Directory LDAP**: <https://docs.microsoft.com/en-us/windows/win32/adsi/search-filter-syntax>
+- **Active Directory LDAP**:
+  <https://docs.microsoft.com/en-us/windows/win32/adsi/search-filter-syntax>
 - **FreeIPA Documentation**: <https://www.freeipa.org/page/Documentation>
 - **Apache Directory Studio**: <https://directory.apache.org/studio/>
 - **LDAP Filter Syntax**: <https://ldap.com/ldap-filters/>
@@ -548,17 +557,3 @@ LDAP_ADMIN_GROUP=CN=Txlog Admins,CN=Users,DC=example,DC=com
 LDAP_VIEWER_GROUP=CN=Txlog Viewers,CN=Users,DC=example,DC=com
 LDAP_GROUP_FILTER=(member=%s)
 ```
-
----
-
-## Conclusion
-
-Each LDAP server can have a different structure. Use exploration tools (`ldapsearch` or Apache Directory Studio) to:
-
-1. ✅ Identify where users are stored.
-2. ✅ Identify which attribute is used for login (uid, sAMAccountName, etc.).
-3. ✅ Identify where groups are stored.
-4. ✅ Identify which attribute stores members (member, uniqueMember, memberUid).
-5. ✅ Test filters manually before configuring Txlog Server.
-
-With this information, you can correctly configure LDAP filters!

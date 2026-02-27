@@ -2,8 +2,9 @@
 
 ## Overview
 
-LDAP authentication has been successfully added to Txlog Server. The implementation provides username/password
-authentication with group-based authorization, working alongside the existing OIDC authentication system.
+LDAP authentication has been successfully added to Txlog Server. The
+implementation provides username/password authentication with group-based
+authorization, working alongside the existing OIDC authentication system.
 
 ## Changes Made
 
@@ -268,36 +269,5 @@ LDAP_VIEWER_GROUP=cn=viewers,ou=groups,dc=example,dc=com
 2. **Password Policies**: Enforced by LDAP server, not the application
 3. **Account Lockout**: Handled by LDAP server
 4. **User Provisioning**: Users must exist in LDAP before login
-5. **Profile Pictures**: LDAP doesn't provide profile pictures (blank for LDAP users)
-
-## Future Enhancements (Not Implemented)
-
-These could be added in future updates:
-
-- Nested group membership support
-- LDAP connection pooling
-- Account lockout tracking in application
-- Failed login attempt rate limiting
-- LDAP group caching for performance
-- Support for multiple LDAP servers (failover)
-
-## Deployment Checklist
-
-- [ ] Configure LDAP environment variables
-- [ ] Test LDAP connectivity with `ldapsearch`
-- [ ] Create admin and viewer groups in LDAP
-- [ ] Add users to appropriate groups
-- [ ] Test LDAP authentication with a test user
-- [ ] Verify admin privileges work correctly
-- [ ] Verify viewer privileges work correctly
-- [ ] Test session management (cookie expiry)
-- [ ] Review application logs for authentication events
-
-## Support
-
-For issues or questions:
-
-1. Review `LDAP_AUTHENTICATION.md` documentation
-2. Check application logs for error messages
-3. Test LDAP connectivity independently
-4. Open an issue at <https://github.com/txlog/server/issues>
+5. **Profile Pictures**: LDAP doesn't provide profile pictures (blank for LDAP
+   users)
