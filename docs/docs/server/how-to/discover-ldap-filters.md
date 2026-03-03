@@ -330,7 +330,7 @@ member: CN=Jane Doe,CN=Users,DC=example,DC=com
 Based on login attribute identified in **Step 3.3**:
 
 | Login Attribute | LDAP_USER_FILTER | System |
-|-----------------|------------------|--------|
+| ----------------- | ------------------ | -------- |
 | `uid` | `(uid=%s)` | OpenLDAP, FreeIPA, 389 DS |
 | `sAMAccountName` | `(sAMAccountName=%s)` | Active Directory |
 | `cn` | `(cn=%s)` | Legacy systems |
@@ -344,7 +344,7 @@ Based on login attribute identified in **Step 3.3**:
 Based on member attribute identified in **Step 4.3**:
 
 | Member Attribute | LDAP_GROUP_FILTER | System |
-|------------------|-------------------|--------|
+| ------------------ | ------------------- | -------- |
 | `member` | `(member=%s)` | groupOfNames, AD |
 | `uniqueMember` | `(uniqueMember=%s)` | groupOfUniqueNames |
 | `memberUid` | `(memberUid=%s)` | posixGroup |

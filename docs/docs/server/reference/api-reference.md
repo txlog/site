@@ -43,6 +43,13 @@ the Swagger UI at `/swagger/index.html`.
 | :--- | :--- | :--- | :--- |
 | `GET` | `/packages/:name/:version/:release/assets` | List assets with specific package. | - |
 
+### Reports
+
+| Method | Path | Description | Query Params |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/reports/monthly` | Monthly package update report. | `month`, `year` |
+| `GET` | `/reports/anomalies` | Detect unusual transaction patterns. | `days` (1-90), `severity` (low/medium/high) |
+
 ### System
 
 | Method | Path | Description |

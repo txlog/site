@@ -91,8 +91,10 @@ export default defineConfig({
               { text: 'Configure LDAP', link: '/docs/server/how-to/configure-ldap' },
               { text: 'Configure OIDC', link: '/docs/server/how-to/configure-oidc' },
               { text: 'Deploy Kubernetes', link: '/docs/server/how-to/deploy-kubernetes' },
+              { text: 'Detect Anomalies', link: '/docs/server/how-to/detect-anomalies' },
               { text: 'Discover LDAP Filters', link: '/docs/server/how-to/discover-ldap-filters' },
               { text: 'Manage API Keys', link: '/docs/server/how-to/manage-api-keys' },
+              { text: 'Manage OSV Vulnerabilities', link: '/docs/server/how-to/manage-osv-vulnerabilities' },
               { text: 'Run Migrations', link: '/docs/server/how-to/run-migrations' },
               { text: 'Run Tests', link: '/docs/server/how-to/run-tests' }
             ]
@@ -118,6 +120,7 @@ export default defineConfig({
               { text: 'LDAP Deep Dive', link: '/docs/server/explanation/ldap-deep-dive' },
               { text: 'LDAP Implementation Details', link: '/docs/server/explanation/ldap-implementation-details' },
               { text: 'LDAP Service Account FAQ', link: '/docs/server/explanation/ldap-service-account-faq' },
+              { text: 'OSV Integration', link: '/docs/server/explanation/osv-integration' },
               { text: 'Testing Strategy', link: '/docs/server/explanation/testing-strategy' }
             ]
           }

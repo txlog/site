@@ -202,7 +202,7 @@ time=... level=ERROR msg="LDAP search failed: LDAP Result Code 32 \"No Such Obje
 The logs show which operation failed:
 
 | Log Message | Incorrect DN | .env Variable |
-|-------------|--------------|---------------|
+| ------------- | -------------- | --------------- |
 | "LDAP user search: baseDN=..." | Base DN | `LDAP_BASE_DN` |
 | "Binding with service account: ..." | Bind DN | `LDAP_BIND_DN` |
 | "LDAP search failed: ... filter=(uid=...)" | Base DN | `LDAP_BASE_DN` |

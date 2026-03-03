@@ -46,8 +46,13 @@ docker run -d --name txlog-server \
 ### Operations
 
 - **[Configure Data Retention](how-to/configure-data-retention.md)**: Manage database cleanup policies.
+- **[Manage OSV Vulnerabilities](how-to/manage-osv-vulnerabilities.md)**: Update, fetch, and rebuild OSV threat data.
 - **[Run Database Migrations](how-to/run-migrations.md)**: Apply schema changes safely.
 - **[Deploy to Kubernetes](how-to/deploy-kubernetes.md)**: Production deployment manifest.
+
+### Reports
+
+- **[Detect Transaction Anomalies](how-to/detect-anomalies.md)**: Detect and manage unusual transactions.
 
 ### Development
 
@@ -77,6 +82,7 @@ docker run -d --name txlog-server \
 ### Architecture
 
 - **[System Architecture](explanation/architecture.md)**: High-level design, stack, and distributed scheduler.
+- **[OSV Integration Details](explanation/osv-integration.md)**: How vulnerability fetching, payload batching, and scoring works.
 - **[Data Model](explanation/data-model.md)**: Entities and relationships explanation.
 
 ### Deep Dives
