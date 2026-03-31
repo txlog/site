@@ -48,13 +48,12 @@ or you want to force the Txlog server to repopulate all CVSS scores from zero:
 2. **Transaction Reset**: Scoreboard counters (`vulns_fixed`,
    `critical_vulns_fixed`, `risk_score_mitigated`, etc.) are zeroed out.
 3. **Fetching**: The underlying Go worker groups packages by their exact OS
-   (e.g., *AlmaLinux:9*) and performs bulk REST API queries.
+   ecosystem (e.g., *AlmaLinux:9*, *Rocky Linux:9*, or *Red
+   Hat:enterprise_linux:9::baseos*) and performs bulk REST API queries.
 4. **Scoring Fallback**: The server extracts CVSS scores intrinsically (e.g.,
    translating "Important" to `8.0`).
 5. **Re-scoring**: It re-evaluates all historical package installations to map
    mitigating actions accurately back to your dashboard.
-
-## How Vulnerability Counts Work
 
 ### The Security Patch Badge
 
@@ -68,11 +67,11 @@ upgraded had more CVEs than the packages installed or upgraded to.
 
 ### Counting Logic
 
-Each vulnerability (CVE/ALSA/GHSA) is counted **once**, regardless of how many
-packages it affects. For example, if advisory `ALSA-2025:23279` affects five
-kernel sub-packages (`kernel`, `kernel-core`, `kernel-modules`,
-`kernel-modules-core`, `kernel-modules-extra`), it is counted as **1
-vulnerability**, not 5.
+Each vulnerability (ALSA/RHSA/RLSA/CVE) is counted **once**, regardless of how
+many packages it affects. For example, if advisory `ALSA-2025:23279` (AlmaLinux)
+or `RHSA-2025:23279` (Red Hat) affects five kernel sub-packages (`kernel`,
+`kernel-core`, `kernel-modules`, `kernel-modules-core`, `kernel-modules-extra`),
+it is counted as **1 vulnerability**, not 5.
 
 The scoreboard for each transaction is calculated as a delta:
 
