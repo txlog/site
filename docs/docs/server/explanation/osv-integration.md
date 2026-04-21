@@ -1,105 +1,84 @@
-# OSV Integration Explained
+# How We Integrated OSV for Vulnerability Tracking
 
-The Txlog server integrates tightly with the **Open Source Vulnerabilities
-(OSV)** database schema distributed by Google via `api.osv.dev`, providing
-real-time data on vulnerabilities affecting packages installed across your
-fleet.
+We've integrated Txlog Server tightly with Google's **Open Source
+Vulnerabilities (OSV)** database to provide real-time data on any
+vulnerabilities affecting the packages installed across your fleet. Why did we
+choose OSV? It's a robust, open standard that allows us to query precisely
+what's happening in your systems without reinventing the wheel. Let's look at
+how we've implemented this behind the scenes.
 
-This document details how vulnerability records are queried, parsed, and
-assigned severity scores, with particular attention to how each Linux
-distribution is mapped to its correct OSV ecosystem.
+## Navigating Ecosystem Isolation
 
-The OSV database maintains **separate advisory databases** for each Linux
-distribution. Each distribution publishes its own security advisories with
-distinct identifiers:
+One of the first things I had to account for is that OSV isn't just one giant
+bucket of data. It maintains separate databases—or "ecosystems"—for each Linux
+distribution. This is crucial because a vulnerability in a package like
+`openssl` might be patched in AlmaLinux but still open in RHEL, or vice versa.
 
-| Distribution | OSV Ecosystem | Advisory Prefix | Example |
-| --- | --- | --- | --- |
-| AlmaLinux | `AlmaLinux:<major>` | ALSA | `ALSA-2024:5529` |
-| Rocky Linux | `Rocky Linux:<major>` | RLSA | `RLSA-2024:5529` |
-| Red Hat Enterprise Linux | `Red Hat:<CPE>` | RHSA | `RHSA-2024:5529` |
+Here's how we map those distributions to their respective OSV ecosystems:
 
-## Why This Matters
+| Distribution | OSV Ecosystem | Advisory Prefix |
+| --- | --- | --- |
+| AlmaLinux | `AlmaLinux:<major>` | ALSA |
+| Rocky Linux | `Rocky Linux:<major>` | RLSA |
+| Red Hat Enterprise Linux | `Red Hat:<CPE>` | RHSA |
 
-Package names alone are not enough to query OSV securely because standard Linux
-packages (e.g., `curl` or `openssl`) share names across entirely different
-ecosystems. If the server requested names without the correct ecosystem,
-vulnerabilities from the wrong distribution would appear — for example, ALSA
-(AlmaLinux) advisories showing up on Red Hat systems, or RHSA (Red Hat)
-advisories on AlmaLinux systems.
+### Why these mappings matter
 
-## How Txlog Maps Each Distribution
+You might wonder why we can't just query by package name. Well, package names
+are often shared across entirely different distributions. If we didn't specify
+the correct ecosystem, you'd end up with "phantom" vulnerabilities—for example,
+seeing AlmaLinux advisories on a Red Hat system. To avoid this, Txlog uses the
+`assets.os` and `transaction_items.repo` fields to build a precise ecosystem
+identifier.
 
-Txlog queries the `assets.os` field (e.g., `"AlmaLinux 9.4"`, `"Red Hat
-Enterprise Linux 9.2"`) and the `transaction_items.repo` field (e.g.,
-`"baseos"`, `"appstream"`) to build the correct ecosystem identifier:
+We've also added some clever mapping for CentOS and Oracle Linux. Since they
+don't have their own dedicated ecosystems in OSV but are binary-compatible with
+RHEL, we map them to the Red Hat advisories (RHSA). It's the most accurate way
+to ensure they're protected.
 
-1. **AlmaLinux** → `AlmaLinux:<major>` (e.g., `AlmaLinux:9`)
-2. **Rocky Linux** → `Rocky Linux:<major>` (e.g., `Rocky Linux:9`)
-3. **Red Hat / CentOS / Oracle Linux** → `Red
-   Hat:enterprise_linux:<major>::<channel>` (e.g., `Red
-   Hat:enterprise_linux:9::baseos`)
+## Our Two-Tier Querying Strategy
 
-The Red Hat ecosystem in OSV uses CPE-based identifiers that include a
-repository channel suffix (`baseos`, `appstream`, or `crb`). Txlog derives the
-correct channel from the `repo` column in `transaction_items`.
+Google's OSV API is powerful, but it has its quirks. Their Batch API is great
+for performance, but it often truncates important fields like summaries and
+descriptions. To get around this while keeping the system fast, I've implemented
+a two-tier approach.
 
-CentOS and Oracle Linux do not have their own ecosystems in OSV and return
-`"Invalid ecosystem"` when queried directly. Since they are binary-compatible
-with RHEL, Txlog maps them to the Red Hat advisories (RHSA) as the closest
-match.
+### 1. The Lightning Batch
 
-Google OSV's Batch API (`/v1/querybatch`) optimizes traffic but severely limits
-semantic data payload by truncating fields like summary and description vectors
-within arrays. To ensure precise mapping while keeping requests fast:
+During our scheduled scans, we send a single `POST` request to the batch
+endpoint with up to 500 package combinations. This gives us a quick list of
+matching advisories. However, since this initial response is stripped of
+metadata, we use it primarily as a discovery phase.
 
-### 1. The Lightning Batch (The `POST` phase)
+### 2. The Detailed Fallback
 
-The scheduled job queries a collection of up to 500 combinations in a single
-`POST` request to `api.osv.dev/v1/querybatch`. Since this request strips
-metadata like `Summary`, `Details`, and the inner array block (`vuln.Affected`),
-Txlog strictly uses the index order returned by Google to know which package
-matched which resulting advisory list.
+As we process those results, we maintain an in-memory RAM cache. If we encounter
+an advisory we haven't seen before, the engine automatically performs a detailed
+`GET` request for that specific ID. This ensures we fetch the full, un-truncated
+JSON schema, which we then cache for the remainder of the scan. It's the best of
+both worlds: high performance with full data integrity.
 
-### 2. The Detailed Fallback (The `GET` phase)
+## Determining Severity and Scores
 
-As the engine iterates over the batches, it builds a local, in-memory **RAM
-Cache**.
+Extracting a consistent severity score can be a bit of a moving target since
+different distributions format their data differently. We've developed a
+multi-tier system to handle this:
 
-If an advisory (e.g., `ALSA-2022:1988` for AlmaLinux, `RHSA-2022:1988` for Red
-Hat, or `RLSA-2022:1988` for Rocky Linux) returned from the batch doesn't exist
-in the Go RAM Cache from past iterations, the engine initiates an isolated `GET`
-to `api.osv.dev/v1/vulns/[ID]`. This fetches the full un-truncated JSON schema
-containing full `Summary` strings needed for accurate severity extraction. The
-data is cached locally for the rest of the scan.
+1. **CVSS Vector Parsing**: If the OSV record includes a CVSS 3.x vector
+    string, we use it to compute an approximate base score.
+2. **Distribution-Specific Labels**: For distributions like AlmaLinux and Rocky
+    Linux, we prioritize their internal labels, such as "Critical" or
+    "Important."
+3. **Text-Based Fallback**: What happens if there's no structured data at all?
+    In those cases, we use keyword matching within the summary and details
+    fields. Since many RHEL-family advisories include severity keywords in their
+    summaries, we map those to standard labels:
+    - **"CRITICAL"** → `CRITICAL` (Score: 9.5)
+    - **"IMPORTANT"** → `HIGH` (Score: 8.0)
+    - **"MODERATE"** → `MEDIUM` (Score: 5.5)
+    - **"LOW"** → `LOW` (Score: 3.0)
 
-Txlog uses a multi-tier approach to determine severity and CVSS scores:
-
-### 1. CVSS Vector Parsing
-
-When the OSV record includes a `severity[]` array with a CVSS 3.x vector string,
-Txlog computes an approximate CVSS base score from the vector components (AV,
-AC, PR, UI, S, C, I, A).
-
-### 2. Distribution-Specific Severity
-
-The `database_specific.severity` field is used as a primary source for
-distributions like AlmaLinux and Rocky Linux, which include labels such as
-`"Important"`, `"Critical"`, `"Moderate"`, or `"Low"`.
-
-### 3. Text-Based Fallback
-
-When neither structured severity data nor CVSS vectors are available, Txlog
-employs keyword matching in the `summary` and `details` fields. Since
-RHEL-family advisories prepend summary strings with severity keywords, these are
-mapped to standard labels:
-
-- **"CRITICAL"** → `CRITICAL` (Synthetic CVSS Score: 9.5)
-- **"IMPORTANT"** → `HIGH` (Synthetic CVSS Score: 8.0)
-- **"MODERATE"** → `MEDIUM` (Synthetic CVSS Score: 5.5)
-- **"LOW"** → `LOW` (Synthetic CVSS Score: 3.0)
-
-If no keyword is matched, it defaults to `UNKNOWN` (0.0).
-
-With these extracted values stored in the database, Txlog successfully renders
-Risk Mitigated charts and Severity trackers on the dashboard.
+By storing these extracted values in our database, we're able to render the Risk
+Mitigated charts and severity trackers you see on your dashboard. It's a complex
+process, but it's what allows us to give you a clear, actionable view of your
+security posture.

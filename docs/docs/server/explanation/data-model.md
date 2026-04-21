@@ -1,88 +1,70 @@
 # Understanding the Data Model
 
-This document explains the conceptual data model of Txlog Server and how different entities relate to each other.
+When I started designing the data model for Txlog Server, I wanted to create
+something that felt intuitive while still being robust enough to handle the
+complexities of distributed asset management. After all, if the foundation isn't
+solid, your visualizations and queries won't be either. Let's walk through our
+core entities and how they all fit together.
 
-## Core Entities
+## The Core Entities
+
+We've broken down our data into four main entities. Think of them as answering
+the basic questions: Who, When, What, and the granular Details.
 
 ### 1. Asset (The "Who")
 
-An **Asset** represents a managed machine. It is the central entity to which all other data is attached.
+An **Asset** represents a managed machine. It's the central hub to which all
+other data is attached. One of the most important concepts here is how we
+separate the `Hostname` from the `MachineID`.
 
-- **Key Concept**: Separation of `Hostname` and `MachineID`.
-- **Hostname**: The stable, human-readable name (e.g., `db-prod-01`).
-- **MachineID**: The unique identifier of the OS installation.
-- **Lifecycle**: An asset is "Active" until a new MachineID appears for the same Hostname, at which point the old one
-  becomes "Inactive".
+- **Hostname**: This is your stable, human-readable name (like `db-prod-01`).
+- **MachineID**: This is the unique identifier of the OS installation itself.
+- **Lifecycle**: We've designed assets to be dynamic. An asset stays "Active"
+    until a new MachineID reports with an old Hostname. At that point, the
+    system realizes the hardware or OS has changed, and it marks the old record
+    as "Inactive" to preserve history.
 
 ### 2. Execution (The "When")
 
-An **Execution** represents a single "check-in" or "run" of the Txlog Agent.
-
-- It captures the state of the machine at a specific point in time.
-- It acts as a heartbeat.
-- Contains metadata like Agent Version, OS Version, and Success/Failure status.
+An **Execution** represents a single "check-in" from the Txlog Agent. You can
+think of it as a heartbeat. It captures the state of the machine at a specific
+point in time, including metadata like the Agent Version and whether the run was
+successful.
 
 ### 3. Transaction (The "What")
 
-A **Transaction** corresponds to a specific DNF/YUM operation (e.g., "Update 5 packages").
-
-- Linked to a specific Asset (via MachineID).
-- Contains the command line run (e.g., `dnf update -y`).
-- Contains the user who ran it.
+A **Transaction** corresponds to a specific DNF/YUM operation—for example,
+updating five packages. Each transaction is linked back to a specific Asset via
+its MachineID. We also store the exact command line that was run and the user
+who initiated it.
 
 ### 4. Transaction Item (The "Details")
 
-A **Transaction Item** is a granular record of a single package being changed within a Transaction.
+This is our most granular record. A **Transaction Item** tracks a single package
+being changed within a larger Transaction. Want to find every server that
+recently upgraded `kernel` from `5.14` to `5.15`? This is where that data lives.
 
-- Example: "Package `kernel` was `Upgraded` from `5.14` to `5.15`".
-- Allows for fine-grained querying (e.g., "Find all servers running openssl 1.1.1").
+## Why We Made Certain Design Choices
 
-## Entity Relationships
-
-```mermaid
-erDiagram
-    ASSET ||--o{ EXECUTION : "reports"
-    ASSET ||--o{ TRANSACTION : "performs"
-    TRANSACTION ||--|{ TRANSACTION_ITEM : "contains"
-
-    ASSET {
-        string hostname
-        string machine_id
-        boolean is_active
-    }
-
-    EXECUTION {
-        timestamp executed_at
-        boolean success
-    }
-
-    TRANSACTION {
-        int id
-        string command
-        string user
-    }
-
-    TRANSACTION_ITEM {
-        string package
-        string version
-        string action
-    }
-```
-
-## Design Considerations
+You might notice some specific decisions that differ from a typical relational
+setup. Let's talk about the "why" behind them.
 
 ### Why Composite Keys?
 
-You might notice that `transactions` use a composite primary key (`transaction_id`, `machine_id`).
-
-- **Reason**: The `transaction_id` comes from the RPM database (BDB/Sqlite) on the client machine. It is unique *per
-  machine* but not globally.
-- **Impact**: To uniquely identify a transaction globally, we must combine the local ID with the machine's unique ID.
+If you look at the `transactions` table, you'll see we use a composite primary
+key consisting of `transaction_id` and `machine_id`. Why not just a single ID?
+Well, the `transaction_id` actually comes from the local RPM database on the
+client machine. While it's unique on that specific server, it's definitely not
+unique across your whole fleet. By combining it with the `machine_id`, we can
+uniquely identify any transaction globally.
 
 ### Why Immutable History?
 
-The system is designed to be an **Audit Log**.
+I've built Txlog Server primarily as an **Audit Log**. This means the data is
+almost entirely append-only. Aside from updating the `last_seen` timestamp on an
+Asset, we rarely modify data once it's been inserted.
 
-- Data is rarely updated after insertion (except for the `last_seen` timestamp on Assets).
-- Executions and Transactions are append-only.
-- This ensures the integrity of the historical record.
+Why take this approach? Because when you're dealing with security and
+compliance, the integrity of your historical record is everything. If you can't
+trust that your logs haven't been tampered with or overwritten, what's the point
+of having them in the first place?
