@@ -1,110 +1,89 @@
-# How to Manage OSV Vulnerabilities
+# Guide: Managing OSV Vulnerabilities
 
-This guide explains how administrators can manually manage, update, or
-completely reset the Open Source Vulnerabilities (OSV) database records inside
-the Txlog server.
+Keeping your systems secure means staying on top of the latest vulnerabilities,
+and I've integrated Google's Open Source Vulnerabilities (OSV) database directly
+into Txlog Server to help you do just that. While the server automatically pulls
+the latest CVEs on a schedule, I know there are times when you need more
+control—whether that’s forcing an immediate update or completely rebuilding your
+local database from scratch. Let's look at how you can manage this critical
+data.
 
-## Overview
+## Getting the Latest Data: Manual Updates
 
-The Txlog server automatically pulls the latest CVEs directly from the Google
-OSV API on a scheduled interval (e.g., using a CRON expression). However, there
-may be times when you need to force an update or completely rebuild the local
-vulnerability database if the cached information is outdated or misaligned.
+If you've just heard about a new zero-day and don't want to wait for the next
+scheduled sync, you can trigger a manual update with a single click.
 
-## Option 1: Trigger a Manual Update
+1. Log in to your **Admin** panel.
+2. Find the OSV section and look for the **Run Manually Now** button.
+3. Once you confirm, the server kicks off a background process that fetches the
+    latest ecosystem mappings and checks them against the Google OSV API.
+4. You can keep an eye on the server logs to watch the progress, or simply
+    monitor the `vulnerabilities` table to see the new records coming in.
 
-If you want to pull down the newest vulnerabilities without waiting for the
-scheduled job:
+## Starting Fresh: Reset and Rebuild
 
-1. Log in to your Txlog **Admin** panel as an Administrator.
-2. In the OSV section, locate the **Run Manually Now** button.
-3. Click the button. A standard confirmation prompt will appear asking if you
-   wish to proceed.
-4. Confirm the action. The server will launch a background process to fetch and
-   process the current ecosystem mappings against the Google OSV API.
-5. You can check the server logs, or monitor the `vulnerabilities` table to see
-   the incoming records.
+Sometimes things get a little messy; maybe you’ve added a new Linux environment
+or you suspect some data might be out of sync. In those cases, I've provided an
+option to wipe the slate clean and rebuild everything from zero.
 
-## Option 2: Reset All Data and Rebuild
+1. In the **Admin** panel, look for **Reset All Data & Rebuild**.
+2. **Warning**: This is a serious operation. We’ll truncate your vulnerability
+    tables and reset all your historical tracking scores to zero. Why would we
+    do this? To ensure that every single CVSS score is repopulated correctly
+    from a clean state.
+3. After you confirm, the database is wiped and an intensive fetch job begins.
+4. Depending on the size of your network, it might take a few moments. You can
+    watch the scores regenerate incrementally on the `Analytics > Security`
+    dashboard.
 
-If you suspect data corruption, missing mapping for specific Linux environments,
-or you want to force the Txlog server to repopulate all CVSS scores from zero:
+### What’s happening under the hood?
 
-1. Log in to the **Admin** panel.
-2. Under the OSV options, click **Reset All Data & Rebuild**.
-3. A critical warning prompt will appear. **Proceeding will truncate the package
-   vulnerabilities and vulnerabilities tables** and reset every transaction
-   tracking score to `0`.
-4. After confirmation, the database is wiped clean and an intensive API
-   data-fetch job starts.
-5. Wait a few moments depending on the size of your asset network. Go to the
-   `Analytics > Security` dashboard to watch the scores regenerate
-   incrementally.
+When you trigger a reset, we don't just delete rows. We zero out scoreboard
+counters like `vulns_fixed` and `risk_score_mitigated`. Then, our Go workers
+group your packages by their exact OS ecosystem (like *AlmaLinux:9* or *RHEL:9*)
+and perform bulk API queries. Finally, we re-evaluate every historical package
+installation to map those mitigating actions accurately back to your dashboard.
 
-### What happens under the hood during a Reset?
+## How We Count Vulnerabilities
 
-1. **Deletion**: `package_vulnerabilities` and `vulnerabilities` tables are
-   wiped.
-2. **Transaction Reset**: Scoreboard counters (`vulns_fixed`,
-   `critical_vulns_fixed`, `risk_score_mitigated`, etc.) are zeroed out.
-3. **Fetching**: The underlying Go worker groups packages by their exact OS
-   ecosystem (e.g., *AlmaLinux:9*, *Rocky Linux:9*, or *Red
-   Hat:enterprise_linux:9::baseos*) and performs bulk REST API queries.
-4. **Scoring Fallback**: The server extracts CVSS scores intrinsically (e.g.,
-   translating "Important" to `8.0`).
-5. **Re-scoring**: It re-evaluates all historical package installations to map
-   mitigating actions accurately back to your dashboard.
+I wanted to make sure our security metrics were as meaningful as possible, so
+I've implemented some specific logic for how we track and display this data.
 
 ### The Security Patch Badge
 
-When a transaction is identified as a security patch, a red shield badge appears
-next to the transaction ID showing the number of unique vulnerabilities fixed.
-This badge is visible on the asset details page.
+When a transaction is identified as a security patch, you'll see a red shield
+badge next to its ID. We classify a transaction as a patch when it results in a
+**net reduction** of known vulnerabilities. In other words: did the packages you
+removed or upgraded have more CVEs than the ones you just installed?
 
-A transaction is classified as a security patch when it results in a **net
-reduction** of known vulnerabilities — that is, when the packages removed or
-upgraded had more CVEs than the packages installed or upgraded to.
+### Our Counting Logic
 
-### Counting Logic
+We count each advisory (like an ALSA or RHSA) exactly **once**, regardless of
+how many packages it affects. If a single kernel advisory affects five different
+sub-packages, we count it as one vulnerability fix, not five. Why inflate the
+numbers when what you really care about is the advisory itself?
 
-Each vulnerability (ALSA/RHSA/RLSA/CVE) is counted **once**, regardless of how
-many packages it affects. For example, if advisory `ALSA-2025:23279` (AlmaLinux)
-or `RHSA-2025:23279` (Red Hat) affects five kernel sub-packages (`kernel`,
-`kernel-core`, `kernel-modules`, `kernel-modules-core`, `kernel-modules-extra`),
-it is counted as **1 vulnerability**, not 5.
-
-The scoreboard for each transaction is calculated as a delta:
+We calculate the delta like this:
 
 ```text
-vulns_fixed = (unique CVEs in removed/upgraded-from packages) − (unique CVEs in installed/upgraded-to packages)
+vulns_fixed = (unique CVEs in old packages) − (unique CVEs in new packages)
 ```
 
-For a pure removal (e.g., `dnf remove kernel-6.12.0`), the formula becomes:
+## Fixed vs. Introduced
 
-```text
-vulns_fixed = (unique CVEs in removed packages) − 0
-```
+- **Fixed**: A vulnerable package was removed or upgraded. Those CVEs are no
+    longer on your system.
+- **Introduced**: This is what we want to avoid. It happens when a package
+    with known vulnerabilities is installed or downgraded to.
 
-### Fixed vs. Introduced
+## Severity and Details
 
-- **Fixed**: The vulnerable package version was removed, upgraded, or obsoleted.
-  The CVEs associated with the old version are no longer present on the system.
-- **Introduced**: A package version with known vulnerabilities was installed or
-  downgraded to. The CVEs associated with the new version are now present on the
-  system.
+We pull severity levels directly from OSV metadata whenever possible. If it’s
+missing, I’ve added a fallback system that tries to infer the severity from
+keywords in the summary.
 
-### Severity Classification
-
-Severity levels (Critical, High, Medium, Low) are inferred from the
-vulnerability metadata provided by the [OSV database](https://osv.dev). When the
-OSV API does not provide an explicit severity, the server attempts to infer it
-from keywords in the vulnerability summary and details fields.
-
-### Viewing Vulnerability Details
-
-On the asset details page, each transaction row has a split button. The main
-"Details" button shows the transaction packages, while the dropdown arrow
-reveals a "Vulnerabilities" option that opens a dedicated modal listing every
-CVE associated with the transaction, including its severity, the affected
-package, and whether it was fixed or introduced. The "Vulnerabilities" option is
-disabled for transactions that have no associated vulnerability data.
+Want to see exactly which CVEs were involved in a transaction? Just use the
+dropdown on the transaction row in the asset details page. It’ll open a modal
+listing every associated CVE, its severity, and whether it was fixed or
+introduced. If there’s no vulnerability data for a transaction, we’ll simply
+disable that option to keep the UI clean.

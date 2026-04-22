@@ -1,53 +1,68 @@
-# How to Run Tests
+# Guide: Running Tests
 
-Txlog Server has a comprehensive test suite covering models, controllers, and integration scenarios.
+I've always believed that a solid codebase is built on a foundation of rigorous
+testing. For Txlog Server, I've put together a comprehensive test suite that
+covers everything from our core models to full integration scenarios. Whether
+you're contributing code or just want to verify your local setup, knowing how to
+run these tests is essential. Ready to see if everything is working as it
+should?
 
-## Running All Tests
+## Running the Suite
 
-To run the entire test suite:
+If you want to run every test in the project, it’s just a single command. It’s
+the best way to ensure no regressions have crept in across the entire codebase.
 
 ```bash
 go test ./...
 ```
 
-## Running Specific Tests
+### Focusing on Specific Areas
 
-To run tests for a specific package (e.g., models):
+Sometimes you're only working on a specific part of the system—maybe you've just
+tweaked a database model. In those cases, there's no need to wait for the entire
+suite. You can target a specific package or even a single test function to get
+faster feedback.
 
 ```bash
+# Run only the model tests
 go test ./models -v
-```
 
-To run a specific test function:
-
-```bash
+# Run a specific test function
 go test ./models -v -run TestAssetManager_UpsertAsset
 ```
 
-## Test Database
+## Setting Up Your Test Database
 
-The tests require a PostgreSQL database. By default, they expect a database named `txlog_test` on localhost.
+Most of our tests require a real PostgreSQL database to run against. By default,
+they’re looking for a database named `txlog_test` on your local machine.
 
-1. **Create the Test Database**:
+1. **Create the Database**: You can use the standard Postgres tools to get this
+    ready.
 
     ```bash
     createdb txlog_test
     ```
 
-    *(Or use your preferred method to create a Postgres DB)*.
-
-2. **Connection String**:
-    The tests use the following default connection string:
-    `host=localhost port=5432 user=postgres password=postgres dbname=txlog_test sslmode=disable`
-
-    If your local setup is different, you may need to modify the `setupTestDB` helper in the test files.
+2. **Connection Details**: We use a standard connection string (`host=localhost
+    port=5432 user=postgres password=postgres dbname=txlog_test
+    sslmode=disable`). If your local setup is different—maybe you’re using a
+    different port or user—you’ll need to adjust the `setupTestDB` helper in the
+    test files to match your environment.
 
 ## Integration Tests
 
-Integration tests in the `tests/` directory simulate full user scenarios. They are slower but verify the system end-to-end.
+In the `tests/` directory, I've included scenarios that simulate full,
+end-to-end user workflows. These are a bit slower than our unit tests because
+they exercise the entire system, but they’re invaluable for catching those
+subtle bugs that only appear when different components start talking to each
+other.
 
 ```bash
 go test ./tests -v
 ```
 
-For more details on the testing strategy, see [TESTING.md](../explanation/testing-strategy.md).
+Once you've got your tests passing, you can be much more confident that your
+changes haven't introduced any unintended side effects. Have you had a chance to
+look at our full [testing strategy](../explanation/testing-strategy.md) yet?
+It’s a great way to understand the "why" behind the way we've structured our
+suite.

@@ -1,16 +1,23 @@
-# How to Deploy to Kubernetes
+# Guide: Deploying to Kubernetes
 
-This guide provides a basic manifest to deploy Txlog Server to a Kubernetes cluster.
+Kubernetes is the go-to for scaling modern applications, and Txlog Server is
+designed to fit right into your cluster. I've put together a standard manifest
+to help you get up and running with a highly available setup. Ready to see those
+pods spinning up? Let's get to it.
 
 ## Prerequisites
 
-- A running Kubernetes cluster.
-- `kubectl` configured.
-- A PostgreSQL database accessible from the cluster.
+Before we start applying manifests, make sure your cluster is ready. Do you have
+`kubectl` configured and a PostgreSQL database that's reachable from within your
+namespace? Having those squared away first will save you a lot of debugging
+later.
 
 ## Deployment Manifest
 
-Save the following content as `txlog-server.yaml`:
+I've combined the Deployment and Service definitions into a single file to keep
+things simple. Save this as `txlog-server.yaml`. You'll notice I've set it to
+run two replicas—because who wants a single point of failure?—and included a
+liveness probe to ensure the server stays healthy.
 
 ```yaml
 apiVersion: apps/v1
@@ -38,7 +45,7 @@ spec:
         - name: LOG_LEVEL
           value: "INFO"
         - name: PGSQL_HOST
-          value: "postgres-service" # Replace with your DB host
+          value: "postgres-service"
         - name: PGSQL_PORT
           value: "5432"
         - name: PGSQL_USER
@@ -50,7 +57,6 @@ spec:
             secretKeyRef:
               name: txlog-secrets
               key: db-password
-        # Add OIDC/LDAP env vars here if needed
         livenessProbe:
           httpGet:
             path: /health
@@ -74,27 +80,39 @@ spec:
 
 ## Steps to Deploy
 
-1. **Create the Secret** for the database password:
+Now for the fun part. It only takes two commands to get the server running.
 
-    ```bash
-    kubectl create secret generic txlog-secrets --from-literal=db-password='your_actual_password'
-    ```
+### 1. Create Your Secrets
 
-2. **Apply the Manifest**:
+I always recommend using Kubernetes Secrets for sensitive data like database
+passwords. Keeping them out of your manifest files is just common sense, isn't
+it?
 
-    ```bash
-    kubectl apply -f txlog-server.yaml
-    ```
+```bash
+kubectl create secret generic txlog-secrets --from-literal=db-password='your_actual_password'
+```
 
-3. **Verify Deployment**:
+### 2. Apply the Manifest
 
-    ```bash
-    kubectl get pods -l app=txlog-server
-    ```
+Once your secrets are in place, just tell Kubernetes to create the resources:
 
-## Exposing the Service
+```bash
+kubectl apply -f txlog-server.yaml
+```
 
-To access the server from outside the cluster, you will typically use an Ingress. Here is a sample Ingress resource:
+### 3. Verify the Deployment
+
+Give it a few seconds and then check to see if your pods are running:
+
+```bash
+kubectl get pods -l app=txlog-server
+```
+
+## Exposing Your Service
+
+To access the server from outside the cluster, you'll typically want to use an
+Ingress. I've put together a sample resource that you can adapt for your own
+domain.
 
 ```yaml
 apiVersion: networking.k8s.io/v1
@@ -114,3 +132,8 @@ spec:
             port:
               number: 80
 ```
+
+Once you've applied this, you should be able to reach your Txlog Server at your
+specified host. If you're using a specific Ingress controller like Nginx or
+Traefik, you might need to add a few annotations, but this basic setup should
+get you moving.

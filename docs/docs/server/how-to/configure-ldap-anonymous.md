@@ -1,38 +1,49 @@
-# LDAP Configuration Without Service Account - Practical Guide
+# Practical Guide: LDAP Configuration Without a Service Account
 
-## When to Use
+I've often found that the simplest way to get LDAP up and running is to skip the
+service account entirely. While it's not the right choice for every environment,
+it's a great way to reduce complexity if your directory allows it. Let's look at
+how you can pull this off and whether it's the right fit for your setup.
 
-Authentication **WITHOUT service account** works when:
+## When Should You Use This?
 
-✅ Your LDAP server allows anonymous bind for searches.
-✅ Authenticated users can read their own groups.
-✅ You are using OpenLDAP with default configuration.
-✅ You want a simpler configuration with fewer credentials.
+In my experience, going **WITHOUT a service account** is a solid option when:
 
-## When NOT to Use (Needs Service Account)
+- ✅ Your LDAP server allows anonymous binds for initial user searches.
+- ✅ Authenticated users have the permission to read their own group
+    memberships.
+- ✅ You're using a standard OpenLDAP setup with default configurations.
+- ✅ You just want a leaner configuration with fewer credentials to manage.
 
-❌ Active Directory (usually requires authentication for searches).
-❌ LDAP with restricted ACLs that block anonymous bind.
-❌ Production environments with strict security policies.
-❌ LDAP that does not allow users to read their own groups.
+## When Should You Avoid It?
 
-## Example 1: Basic OpenLDAP (No Service Account)
+Sometimes, you just can't get around needing a service account. You'll likely
+need one if:
+
+- ❌ You're dealing with Active Directory (it almost always requires
+    authentication for searches).
+- ❌ Your LDAP has strict ACLs that block anonymous binds.
+- ❌ You're in a high-security production environment with rigid policies.
+- ❌ Your LDAP server doesn't allow users to see their own groups by default.
+
+## Examples to Get You Started
+
+### Minimal OpenLDAP Setup
+
+If you're looking for the absolute minimum, this is it. Only four variables!
+It's clean, direct, and avoids any unnecessary overhead.
 
 ```bash
-# Minimal configuration - only 4 variables!
 LDAP_HOST=ldap.mycompany.com
 LDAP_BASE_DN=ou=users,dc=mycompany,dc=com
 LDAP_ADMIN_GROUP=cn=admins,ou=groups,dc=mycompany,dc=com
 LDAP_VIEWER_GROUP=cn=viewers,ou=groups,dc=mycompany,dc=com
 ```
 
-### How It Works
+### Adding a Layer of Security with TLS
 
-1. **User Search**: Anonymous bind → search user by `uid`.
-2. **Authentication**: Bind with the user's own credentials.
-3. **Group Check**: Uses the user's authenticated session to read groups.
-
-## Example 2: OpenLDAP with TLS (No Service Account)
+Even without a service account, you shouldn't skip encryption. I always
+recommend using TLS if your server supports it.
 
 ```bash
 LDAP_HOST=ldap.mycompany.com
@@ -41,28 +52,33 @@ LDAP_USE_TLS=true
 LDAP_BASE_DN=ou=people,dc=mycompany,dc=com
 LDAP_USER_FILTER=(uid=%s)
 LDAP_ADMIN_GROUP=cn=txlog-admins,ou=groups,dc=mycompany,dc=com
-LDAP_VIEWER_GROUP=cn=txlog-users,ou=groups,dc=mycompany,dc=com
+LDAP_VIEWER_GROUP=cn=txlog-users,ou=groups,dc=company,dc=com
 ```
 
-## Example 3: Testing Without Service Account
+## Testing Before You Deploy
 
-### Test 1: Verify if anonymous bind works
+Before you commit to this approach, I'd suggest running a couple of quick tests.
+It’s better to find out now if your directory will play along, right?
+
+### Test 1: Can we search anonymously?
+
+Try to find a user without providing any credentials:
 
 ```bash
-# Try to search without authentication
 ldapsearch -H ldap://ldap.mycompany.com:389 \
   -x \
   -b "ou=users,dc=mycompany,dc=com" \
   "(uid=myuser)"
 ```
 
-**If it works**: ✅ Can use without service account.
-**If fails with "No such object" or "Insufficient access"**: ❌ Needs service account.
+If this returns the user record, you're halfway there! If you get an
+"Insufficient access" error, you'll definitely need that service account.
 
-### Test 2: Verify group reading
+### Test 2: Can a user read their own groups?
+
+Now, let's see if the user can actually see the group they're supposed to be in:
 
 ```bash
-# Authenticate as user and try to read group
 ldapsearch -H ldap://ldap.mycompany.com:389 \
   -D "uid=myuser,ou=users,dc=mycompany,dc=com" \
   -w "mypassword" \
@@ -70,248 +86,62 @@ ldapsearch -H ldap://ldap.mycompany.com:389 \
   "(member=uid=myuser,ou=users,dc=mycompany,dc=com)"
 ```
 
-**If returns the group**: ✅ Group verification will work.
-**If fails**: ❌ Needs service account with read permissions.
+If you see the group in the output, you're all set.
 
-## OpenLDAP Configuration to Allow Anonymous Bind
+## Weighing the Pros and Cons
 
-If you manage the OpenLDAP server, configure to allow anonymous reads:
+I like to think of the choice between using a service account or not as a
+trade-off between simplicity and robustness.
 
-```ldif
-# /etc/ldap/slapd.conf or via olcAccess
+### The Lean Approach (No Service Account)
 
-# Allow anonymous read for users and groups
-olcAccess: {0}to dn.subtree="ou=users,dc=mycompany,dc=com"
-  by anonymous read
-  by * read
+- **Pros**: It’s much faster to set up and there are fewer moving parts to
+    break. You don't have to worry about rotated service account passwords or
+    creating extra objects in your directory.
+- **Cons**: It’s less flexible. It won't work with Active Directory and might
+    hit a wall if your security team decides to tighten up anonymous access.
 
-olcAccess: {1}to dn.subtree="ou=groups,dc=mycompany,dc=com"
-  by anonymous read
-  by * read
-```
+### The Robust Approach (With Service Account)
 
-## Comparison: With vs Without Service Account
+- **Pros**: This is the "industry standard" for a reason. It works with almost
+    every directory, including AD, and gives you much more granular control over
+    what the application can see.
+- **Cons**: It’s more work. You've got more environment variables to track and
+    a whole extra set of credentials to secure.
 
-### WITHOUT Service Account (Simpler)
+## Understanding the Authentication Flow
 
-**Pros:**
+I've mapped out how the server actually handles the login process in both
+scenarios. Seeing it side-by-side usually makes the difference much clearer.
 
-- ✅ Simpler configuration (fewer variables).
-- ✅ No need to create service account.
-- ✅ Fewer credentials to manage.
-- ✅ Works well with standard OpenLDAP.
+### Without a Service Account
 
-**Cons:**
+1. A user sends their credentials.
+2. The server connects to LDAP anonymously.
+3. It searches for the user's DN.
+4. Once found, it tries to "bind" (log in) using the user's actual password.
+5. If that works, it uses that same session to check the user's groups.
+6. The user is logged in!
 
-- ❌ Does not work with Active Directory (usually).
-- ❌ Requires anonymous bind enabled.
-- ❌ May not meet security policies.
-- ❌ User needs permission to read groups.
+### With a Service Account
 
-**Configuration:**
+1. A user sends their credentials.
+2. The server connects and binds using the **service account** first.
+3. It uses that account to find the user's DN.
+4. It then attempts a separate bind with the user's credentials to verify the
+    password.
+5. Finally, it goes back to the service account to verify the user's group
+    memberships.
+6. The user is logged in!
 
-```bash
-LDAP_HOST=ldap.example.com
-LDAP_BASE_DN=ou=users,dc=example,dc=com
-LDAP_ADMIN_GROUP=cn=admins,ou=groups,dc=example,dc=com
-LDAP_VIEWER_GROUP=cn=viewers,ou=groups,dc=example,dc=com
-```
+## Common Pitfalls and Solutions
 
-### WITH Service Account (More Robust)
+Even with a simple setup, things can go wrong. If you're running into "User not
+found" errors, my first step is always to verify anonymous search with
+`ldapsearch`. If that fails, your directory is likely locked down more than you
+thought, and it's time to bring in a service account.
 
-**Pros:**
-
-- ✅ Works with Active Directory.
-- ✅ Works with restrictive LDAP.
-- ✅ More control over permissions.
-- ✅ Better for production.
-
-**Cons:**
-
-- ❌ More configuration variables.
-- ❌ Need to create and manage service account.
-- ❌ One more password to store securely.
-
-**Configuration:**
-
-```bash
-LDAP_HOST=ldap.example.com
-LDAP_BIND_DN=cn=readonly,dc=example,dc=com
-LDAP_BIND_PASSWORD=service_account_password
-LDAP_BASE_DN=ou=users,dc=example,dc=com
-LDAP_ADMIN_GROUP=cn=admins,ou=groups,dc=example,dc=com
-LDAP_VIEWER_GROUP=cn=viewers,ou=groups,dc=example,dc=com
-```
-
-## Detailed Authentication Flow
-
-### Without Service Account
-
-```text
-1. Client sends username + password
-   ↓
-2. Server connects to LDAP (anonymous)
-   ↓
-3. Searches user: ldapsearch -x "(uid=username)"
-   ↓
-4. Finds: uid=username,ou=users,dc=example,dc=com
-   ↓
-5. Authenticates: bind with uid=username + user password
-   ↓
-6. Checks groups using user's authenticated session
-   ↓
-7. Creates session in Txlog Server
-   ↓
-8. User logged in!
-```
-
-### With Service Account
-
-```text
-1. Client sends username + password
-   ↓
-2. Server connects to LDAP
-   ↓
-3. Bind with service account
-   ↓
-4. Searches user: ldapsearch "(uid=username)"
-   ↓
-5. Finds: uid=username,ou=users,dc=example,dc=com
-   ↓
-6. Authenticates: bind with uid=username + user password
-   ↓
-7. Re-bind with service account
-   ↓
-8. Checks groups using service account
-   ↓
-9. Creates session in Txlog Server
-   ↓
-10. User logged in!
-```
-
-## Troubleshooting
-
-### Error: "User not found"
-
-**Without service account:**
-
-```bash
-# Test anonymous search
-ldapsearch -H ldap://your-ldap:389 -x \
-  -b "ou=users,dc=example,dc=com" \
-  "(uid=testuser)"
-```
-
-**Solution:** If fails, you need a service account.
-
-### Error: "Failed to check group membership"
-
-**Without service account:**
-
-```bash
-# Test if user can read groups
-ldapsearch -H ldap://your-ldap:389 \
-  -D "uid=testuser,ou=users,dc=example,dc=com" \
-  -w "password" \
-  -b "cn=admins,ou=groups,dc=example,dc=com"
-```
-
-**Solution:** If fails, configure service account with read permission on groups.
-
-### Error: "Failed to connect to LDAP"
-
-Same problem with or without service account - check:
-
-- Correct host and port.
-- Firewall allowed.
-- LDAP server running.
-
-## Recommendations
-
-### Development/Test
-
-✅ **Use WITHOUT service account** if possible.
-
-- Faster to configure.
-- Less complex.
-- Local OpenLDAP usually allows it.
-
-### Production
-
-✅ **Use WITH service account**.
-
-- More secure.
-- More control.
-- Works with Active Directory.
-- Meets security policies.
-
-### Mixed Environments
-
-✅ **Start WITHOUT service account**.
-
-- Test basic connectivity.
-- If it works, decide if you will add service account.
-- If it doesn't work, add service account.
-
-## Complete Example: Docker Compose
-
-### Without Service Account (OpenLDAP)
-
-```yaml
-version: '3.8'
-services:
-  txlog-server:
-    image: ghcr.io/txlog/server:main
-    ports:
-      - "8080:8080"
-    environment:
-      # Database
-      - PGSQL_HOST=postgres
-      - PGSQL_DB=txlog
-      - PGSQL_USER=txlog
-      - PGSQL_PASSWORD=txlog_password
-
-      # LDAP - WITHOUT service account
-      - LDAP_HOST=openldap
-      - LDAP_BASE_DN=ou=users,dc=example,dc=com
-      - LDAP_ADMIN_GROUP=cn=admins,ou=groups,dc=example,dc=com
-      - LDAP_VIEWER_GROUP=cn=viewers,ou=groups,dc=example,dc=com
-```
-
-### With Service Account (Active Directory)
-
-```yaml
-version: '3.8'
-services:
-  txlog-server:
-    image: ghcr.io/txlog/server:main
-    ports:
-      - "8080:8080"
-    environment:
-      # Database
-      - PGSQL_HOST=postgres
-      - PGSQL_DB=txlog
-      - PGSQL_USER=txlog
-      - PGSQL_PASSWORD=txlog_password
-
-      # LDAP - WITH service account
-      - LDAP_HOST=ad.company.local
-      - LDAP_BIND_DN=CN=SvcTxlog,OU=ServiceAccounts,DC=company,DC=local
-      - LDAP_BIND_PASSWORD=service_password
-      - LDAP_BASE_DN=CN=Users,DC=company,DC=local
-      - LDAP_USER_FILTER=(sAMAccountName=%s)
-      - LDAP_ADMIN_GROUP=CN=TxlogAdmins,OU=Groups,DC=company,DC=local
-      - LDAP_VIEWER_GROUP=CN=TxlogUsers,OU=Groups,DC=company,DC=local
-```
-
-## Conclusion
-
-Authentication **WITHOUT service account** is:
-
-- ✅ **Simpler** to configure.
-- ✅ **Perfectly functional** for OpenLDAP.
-- ✅ **Ideal for development** and less restrictive environments.
-- ❌ **Does not work** with typical Active Directory.
-- ❌ **May not meet** corporate security policies.
-
-**Recommendation:** Start without service account. If it works and meets your security needs, great! If it doesn't work or if you need more control, add the service account.
+If you can find the user but group membership checks fail, it usually means the
+user doesn't have the right permissions to see the group objects. You can either
+fix the ACLs on your LDAP server or, again, switch to using a service account
+that already has those permissions.

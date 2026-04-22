@@ -1,42 +1,59 @@
-# How to Manage API Keys
+# Guide: Managing API Keys
 
-API Keys are used by Agents to authenticate with the Txlog Server when pushing data. This guide explains how to create,
-revoke, and delete them.
+When you have agents out in the field pushing data to your server, you need a
+way to make sure they're authorized to do so. That’s where API keys come in.
+I've designed our API key system to be both secure and easy to manage, giving
+you full control over which agents can talk to your instance. Let's look at how
+you can create, revoke, and delete these keys to keep your environment secure.
 
 ## Prerequisites
 
-- You must be logged in as an **Admin** (via OIDC or LDAP).
-- If no authentication is configured on the server, API keys are **not required** for agents, and this section is not applicable.
+Before we get started, there are a couple of things you should know:
 
-## Creating an API Key
+- **Admin Access**: You'll need to be logged in as an Admin (via OIDC or LDAP)
+    to access the API key management tools.
+- **Auth Requirement**: If you haven't enabled authentication on your server,
+    your agents won't actually need a key to push data. However, I strongly
+    recommend enabling auth for any setup that isn't just for local testing.
 
-1. Log in to the Txlog Server.
-2. Navigate to the **Admin Panel** (usually `/admin`).
-3. Locate the **API Keys** section.
-4. Enter a **Name** for the new key (e.g., "Production Cluster A").
-5. Click **Create API Key**.
-6. **IMPORTANT**: A modal or message will appear showing the full API Key (e.g., `txlog_sk_...`). **Copy this key
-    immediately**. It will never be shown again.
+## Creating a New API Key
 
-## Revoking an API Key
+Creating a key only takes a few seconds. I’ve kept the process lean so you can
+get your agents connected and moving quickly.
 
-Revoking a key prevents it from being used but keeps the record in the database for audit purposes.
+1. Log in to your Txlog Server and head over to the **Admin Panel**.
+2. Find the **API Keys** section.
+3. Give your new key a descriptive name.
+4. Click **Create API Key**.
+5. **IMPORTANT**: A modal will pop up showing your full API Key. **Copy this key
+    immediately and store it somewhere safe.** We don't store the plain-text key
+    in our database for security reasons, which means we can't show it to you
+    ever again. If you lose it, you'll have to create a new one.
 
-1. Go to the **Admin Panel**.
-2. Find the key in the list.
+## Revoking a Key
+
+Sometimes you need to stop a key from working but don't necessarily want to
+erase its history. That's where revoking comes in handy. It’s a soft disable
+that keeps the record in the database for auditing purposes.
+
+1. Navigate to the **Admin Panel**.
+2. Find the key you want to disable in the list.
 3. Click the **Revoke** button.
-4. The key status will change to `Inactive`. Agents using this key will immediately receive `401 Unauthorized` errors.
+4. The status will flip to `Inactive`. Any agent trying to use this key will
+    immediately start receiving `401 Unauthorized` errors.
 
-## Deleting an API Key
+## Deleting a Key Permanently
 
-Deleting a key removes it permanently from the database.
+If you're sure you don't need a key anymore and don't care about keeping a
+record of it, you can delete it permanently.
 
-1. Go to the **Admin Panel**.
-2. Find the key in the list.
-3. Click the **Delete** button.
-4. Confirm the action.
+1. In the **Admin Panel**, locate the key.
+2. Click the **Delete** button.
+3. Confirm the action when prompted. Remember, there's no undo button here.
 
-## Using the API Key
+## Configuring Your Agent with the Key
 
-Configure your Txlog Agent to use the key by setting the `TXLOG_API_KEY` environment variable or configuration option
-on the agent side.
+Now that you've got your key, you just need to tell your Txlog Agent to use it.
+The easiest way to do this is by setting the `TXLOG_API_KEY` environment
+variable on the host where the agent is running. Once that's set, your data
+should start flowing into the server immediately.
