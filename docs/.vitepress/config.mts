@@ -61,6 +61,7 @@ export default defineConfig({
             collapsed: true,
             items: [
               { text: 'Architecture Overview', link: '/docs/agent/explanation/architecture_overview' },
+              { text: 'Data Collection', link: '/docs/agent/explanation/data_collection' },
               { text: 'Data Synchronization', link: '/docs/agent/explanation/data_synchronization' },
               { text: 'Design Choices', link: '/docs/agent/explanation/design_choices' },
               { text: 'MCP Integration', link: '/docs/agent/explanation/mcp_integration' }
