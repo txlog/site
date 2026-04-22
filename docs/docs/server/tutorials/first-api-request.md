@@ -5,7 +5,6 @@ retrieve a list of registered machines.
 
 ## Prerequisites
 
-- You have completed the [Getting Started](getting-started.md) tutorial.
 - The server is running at `http://localhost:8080`.
 - You have `curl` installed (or another API client like Postman).
 
