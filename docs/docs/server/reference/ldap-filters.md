@@ -1,28 +1,45 @@
-# Quick Guide: LDAP Filters
+# Reference: LDAP Filters
 
-## TL;DR - Discovering Your Filters
+LDAP filters can look like a mess of parentheses and attributes when you first
+see them, can’t they? Don’t worry, they’re actually quite logical once you break
+them down. I’ve written this guide to help you find the exact strings you need
+to plug into your `.env` file so authentication just works. Ready to find your
+filters?
 
-### Method 1: Automatic Script (Recommended)
+## Discovering Your Filters
+
+How do I find these filters? Well, I’ve actually written a script to make this
+whole process a lot easier for you. If you’re not in the mood for manual
+searching, just run the discovery script and follow the prompts.
+
+### Method 1: The Easy Way (Recommended)
+
+Just run my automatic script and it'll guide you through the process
+step-by-step.
 
 ```bash
 ./ldap-discovery.sh
 ```
 
-### Method 2: Manual with ldapsearch
+### Method 2: The Manual Way
 
-**1. Find users:**
+If you prefer to get your hands dirty with the command line, `ldapsearch` is
+your best friend. Here are the commands I use to identify user and group
+attributes.
+
+**1. Find your users:**
 
 ```bash
 ldapsearch -H ldap://your-server:389 -x -D "cn=admin,dc=example,dc=com" -W -b "dc=example,dc=com" "(uid=username)"
 ```
 
-**2. View user attributes:**
+**2. View specific user attributes:**
 
 ```bash
 ldapsearch -H ldap://your-server:389 -x -D "cn=admin,dc=example,dc=com" -W -b "dc=example,dc=com" "(uid=john)" dn uid cn sAMAccountName
 ```
 
-**3. View groups:**
+**3. View your groups:**
 
 ```bash
 ldapsearch -H ldap://your-server:389 -x -D "cn=admin,dc=example,dc=com" -W -b "dc=example,dc=com" "(cn=admins)" dn member uniqueMember memberUid
@@ -30,7 +47,10 @@ ldapsearch -H ldap://your-server:389 -x -D "cn=admin,dc=example,dc=com" -W -b "d
 
 ---
 
-## Common Values by Server Type
+## Common Filters by Server Type
+
+Different servers use different attribute names. Do you know which one you're
+running? Here are the defaults I usually start with.
 
 ### OpenLDAP (Standard)
 
@@ -46,13 +66,6 @@ LDAP_USER_FILTER=(sAMAccountName=%s)
 LDAP_GROUP_FILTER=(member=%s)
 ```
 
-### FreeIPA
-
-```bash
-LDAP_USER_FILTER=(uid=%s)
-LDAP_GROUP_FILTER=(member=%s)
-```
-
 ### OpenLDAP with posixGroup
 
 ```bash
@@ -60,27 +73,29 @@ LDAP_USER_FILTER=(uid=%s)
 LDAP_GROUP_FILTER=(memberUid=%s)
 ```
 
-⚠️ **Attention:** posixGroup uses only the `uid` (e.g., `john`) and not the full DN.
+*Note: `posixGroup` is a bit special because it uses only the `uid` (like
+`john`) instead of the full DN. I've handled this in the code, so it should work
+out of the box.*
 
 ---
 
-## Quick Reference Table
+## Quick Reference Tables
 
-### USER_FILTER - By System
+### User Filters
 
 | System | Attribute | Filter |
-| -------- | ----------- | -------- |
+| --- | --- | --- |
 | OpenLDAP | `uid` | `(uid=%s)` |
 | Active Directory | `sAMAccountName` | `(sAMAccountName=%s)` |
 | AD (email login) | `userPrincipalName` | `(userPrincipalName=%s)` |
 | FreeIPA | `uid` | `(uid=%s)` |
-| Legacy | `cn` | `(cn=%s)` |
+| Legacy Systems | `cn` | `(cn=%s)` |
 | Email login | `mail` | `(mail=%s)` |
 
-### GROUP_FILTER - By Group Type
+### Group Filters
 
 | ObjectClass | Member Attribute | Filter | Expected Value |
-| ------------- | ------------------ | -------- | ---------------- |
+| --- | --- | --- | --- |
 | `groupOfNames` | `member` | `(member=%s)` | Full DN |
 | `groupOfUniqueNames` | `uniqueMember` | `(uniqueMember=%s)` | Full DN |
 | `posixGroup` | `memberUid` | `(memberUid=%s)` | uid only |
@@ -88,149 +103,58 @@ LDAP_GROUP_FILTER=(memberUid=%s)
 
 ---
 
-## How to Know Which One to Use?
+## How Do I Know Which One to Use?
 
-### Step 1: Identify User Login Attribute
+If you're not sure, don't guess! I'll show you how to find out exactly what your
+server expects.
 
-Search for a user and see which field contains the login name:
+### Step 1: Identify the User Login Attribute
 
-```bash
-ldapsearch -x -D "cn=admin,dc=example,dc=com" -W -b "dc=example,dc=com" "(objectClass=person)" uid cn sAMAccountName
-```
+Search for a person in your directory and look for the field that contains their
+login name. In OpenLDAP, it’s usually `uid`. In Active Directory, it’s almost
+always `sAMAccountName`.
 
-OpenLDAP output example:
+### Step 2: Identify the Group Member Attribute
 
-```text
-dn: uid=john.doe,ou=users,dc=example,dc=com
-uid: john.doe          ← This is the login field!
-cn: John Doe
-```
-
-Active Directory output example:
-
-```text
-dn: CN=John Doe,CN=Users,DC=example,DC=com
-sAMAccountName: john.doe    ← This is the login field!
-cn: John Doe
-```
-
-**Result:** Use the attribute name in the filter → `(uid=%s)` or `(sAMAccountName=%s)`
+Search for a group and see how the members are listed. Does it show their full
+DN (like `uid=john,ou=users...`) or just their username? If it’s the full DN,
+use `(member=%s)`. If it’s just the username, you’re likely looking at a
+`posixGroup` and should use `(memberUid=%s)`.
 
 ---
 
-### Step 2: Identify Group Member Attribute
+## Testing Before You Commit
 
-Search for a group and see which field lists the members:
+I always recommend testing your filters manually before plugging them into the
+server. It saves so much time in the long run.
 
-```bash
-ldapsearch -x -D "cn=admin,dc=example,dc=com" -W -b "dc=example,dc=com" "(cn=admins)" member uniqueMember memberUid
-```
+### Test 1: Can I find the user?
 
-Example with `member`:
-
-```text
-dn: cn=admins,ou=groups,dc=example,dc=com
-member: uid=john.doe,ou=users,dc=example,dc=com    ← Full DN
-member: uid=jane.doe,ou=users,dc=example,dc=com
-```
-
-**Result:** `LDAP_GROUP_FILTER=(member=%s)`
-
-Example with `memberUid`:
-
-```text
-dn: cn=admins,ou=groups,dc=example,dc=com
-memberUid: john.doe    ← Just the uid, no DN
-memberUid: jane.doe
-```
-
-**Result:** `LDAP_GROUP_FILTER=(memberUid=%s)`
-⚠️ **Requires code modification to extract only the uid from the DN**
-
----
-
-## Testing Before Configuring
-
-### Test 1: Can the user be found?
+Run this and make sure it returns exactly one user. If it returns nothing, your
+filter or your base DN is probably wrong.
 
 ```bash
-# Replace %s with real username
 ldapsearch -x -D "cn=admin,dc=example,dc=com" -W -b "dc=example,dc=com" "(uid=john.doe)"
 ```
 
-✅ Should return **exactly 1 user**
+### Test 2: Is the user in the group?
 
-### Test 2: Does the user belong to the group?
+Replace the group and user DNs with your own. If the command returns the group
+object, then your filter is working perfectly.
 
 ```bash
-# Replace group DN and user DN
 ldapsearch -x -D "cn=admin,dc=example,dc=com" -W \
   -b "cn=admins,ou=groups,dc=example,dc=com" \
   -s base \
   "(member=uid=john.doe,ou=users,dc=example,dc=com)"
 ```
 
-✅ Should return the group if the user is a member
+## Wrapping Up
 
----
-
-## Complete .env Example
-
-```bash
-# OpenLDAP
-LDAP_HOST=ldap.company.com
-LDAP_PORT=389
-LDAP_USE_TLS=false
-LDAP_BASE_DN=dc=company,dc=com
-LDAP_BIND_DN=cn=readonly,dc=company,dc=com
-LDAP_BIND_PASSWORD=readonly_password
-
-LDAP_USER_FILTER=(uid=%s)
-LDAP_ADMIN_GROUP=cn=txlog-admins,ou=groups,dc=company,dc=com
-LDAP_VIEWER_GROUP=cn=txlog-viewers,ou=groups,dc=company,dc=com
-LDAP_GROUP_FILTER=(member=%s)
-```
-
-```bash
-# Active Directory
-LDAP_HOST=ad.company.com
-LDAP_PORT=636
-LDAP_USE_TLS=true
-LDAP_SKIP_TLS_VERIFY=false
-LDAP_BASE_DN=DC=company,DC=com
-LDAP_BIND_DN=CN=LDAP Service,OU=Service Accounts,DC=company,DC=com
-LDAP_BIND_PASSWORD=service_account_password
-
-LDAP_USER_FILTER=(sAMAccountName=%s)
-LDAP_ADMIN_GROUP=CN=Txlog Admins,OU=Security Groups,DC=company,DC=com
-LDAP_VIEWER_GROUP=CN=Txlog Users,OU=Security Groups,DC=company,DC=com
-LDAP_GROUP_FILTER=(member=%s)
-```
-
----
-
-## Common Errors
-
-| Error | Cause | Solution |
-| --------- | ------- | ---------- |
-| "user not found" | Wrong LDAP_USER_FILTER | Use `ldapsearch` to test the filter |
-| "not a member of any authorized group" | Wrong LDAP_GROUP_FILTER or incorrect group | Check if user is in group and test filter |
-| "failed to bind" | Incorrect LDAP_BIND_DN or password | Test bind manually |
-| "connection refused" | Incorrect Host/Port or firewall | Check connectivity with `telnet` |
-
----
-
-## Resources
-
-- **Full Document:** `LDAP_FILTER_DISCOVERY.md`
-- **Interactive Script:** `./ldap-discovery.sh`
-- **Official LDAP Documentation:** <https://ldap.com/ldap-filters/>
-
----
-
-## Final Tip
-
-**Use the `ldap-discovery.sh` script** - it guides you step-by-step to discover all necessary values interactively!
+The most important thing is to match the attribute name in your filter with what
+your server actually uses. Once you've got that down, you're golden. If you’re
+still feeling stuck, just use the `ldap-discovery.sh` script I mentioned
+earlier. It’s saved me more times than I can count!
 
 ```bash
 chmod +x ldap-discovery.sh

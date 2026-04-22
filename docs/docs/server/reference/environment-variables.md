@@ -1,56 +1,75 @@
-# Environment Variables Reference
+# Reference: Environment Variables
 
-Configuration reference for Txlog Server.
+Configuring Txlog Server is straightforward because I’ve designed it to be
+entirely environment-driven. Whether you're running it in a Docker container or
+directly on a Linux host, these variables are the levers you'll use to tune the
+system to your needs. Let's look at the options available to you.
 
-## General
+## General Settings
+
+These are the basic knobs that control the server's identity and how it talks to
+you through logs.
 
 | Variable | Default | Description |
 | :--- | :--- | :--- |
-| `INSTANCE` | - | Name of the environment (e.g., "Production"). Displayed in UI. |
-| `LOG_LEVEL` | `INFO` | Logging verbosity (`DEBUG`, `INFO`, `WARN`, `ERROR`). |
-| `GIN_MODE` | `release` | Gin framework mode (`debug`, `release`). |
-| `PORT` | `8080` | HTTP port to listen on. |
+| `INSTANCE` | - | The name of your environment (e.g., "Production"). It’s displayed in the UI, so why not make it clear for your team? |
+| `LOG_LEVEL` | `INFO` | How much detail do you want in the logs? Choose from `DEBUG`, `INFO`, `WARN`, or `ERROR`. |
+| `GIN_MODE` | `release` | Setting this to `release` mode isn't just for performance; it also ensures that session cookies are automatically marked as `Secure`. |
+| `PORT` | `8080` | The HTTP port I'll listen on. |
 
-## Database
+## Database Configuration
+
+We use PostgreSQL for everything, and these variables tell the server exactly
+how to find and talk to your database instance.
 
 | Variable | Required | Description |
 | :--- | :--- | :--- |
-| `PGSQL_HOST` | Yes | Database hostname or IP. |
-| `PGSQL_PORT` | Yes | Database port (default `5432`). |
-| `PGSQL_USER` | Yes | Database username. |
-| `PGSQL_PASSWORD` | Yes | Database password. |
-| `PGSQL_DB` | Yes | Database name. |
-| `PGSQL_SSLMODE` | Yes | SSL mode (`disable`, `require`, `verify-full`). |
+| `PGSQL_HOST` | Yes | Your database hostname or IP address. |
+| `PGSQL_PORT` | Yes | The database port (usually `5432`). |
+| `PGSQL_USER` | Yes | Your database username. |
+| `PGSQL_PASSWORD` | Yes | Your database password. |
+| `PGSQL_DB` | Yes | The name of the database I should use. |
+| `PGSQL_SSLMODE` | Yes | SSL mode (`disable`, `require`, `verify-full`). In production, I’d strongly suggest `verify-full` for maximum security. |
 
 ## Authentication (OIDC)
 
+If you're using a modern identity provider like Google, Okta, or Authentik, OIDC
+is the way to go.
+
 | Variable | Required | Description |
 | :--- | :--- | :--- |
-| `OIDC_ISSUER_URL` | No | OIDC Provider URL (e.g., `https://accounts.google.com`). |
-| `OIDC_CLIENT_ID` | No | Client ID from provider. |
-| `OIDC_CLIENT_SECRET` | No | Client Secret from provider. |
-| `OIDC_REDIRECT_URL` | No | Callback URL (must match provider config). |
-| `OIDC_SKIP_TLS_VERIFY` | No | Set `true` to skip TLS checks (dev only). |
+| `OIDC_ISSUER_URL` | No | Your OIDC Provider URL (e.g., `https://accounts.google.com`). |
+| `OIDC_CLIENT_ID` | No | The Client ID provided by your identity provider. |
+| `OIDC_CLIENT_SECRET` | No | The Client Secret associated with your ID. |
+| `OIDC_REDIRECT_URL` | No | The callback URL. Make sure this exactly matches what you’ve configured in your provider’s dashboard! |
 
 ## Authentication (LDAP)
 
+For those of you still relying on a classic directory service, I’ve included
+robust LDAP support.
+
 | Variable | Required | Description |
 | :--- | :--- | :--- |
-| `LDAP_HOST` | No | LDAP server hostname. |
-| `LDAP_PORT` | No | LDAP port (`389` or `636`). |
-| `LDAP_USE_TLS` | No | `true` for LDAPS. |
-| `LDAP_BIND_DN` | No | Service account DN. |
-| `LDAP_BIND_PASSWORD` | No | Service account password. |
-| `LDAP_BASE_DN` | No | Base DN for user search. |
-| `LDAP_USER_FILTER` | No | Filter for users (e.g., `(uid=%s)`). |
-| `LDAP_ADMIN_GROUP` | No | DN of admin group. |
-| `LDAP_VIEWER_GROUP` | No | DN of viewer group. |
+| `LDAP_HOST` | No | Your LDAP server hostname. |
+| `LDAP_PORT` | No | The LDAP port (usually `389` or `636`). |
+| `LDAP_USE_TLS` | No | Set this to `true` if you're using LDAPS. |
+| `LDAP_BIND_DN` | No | The DN for your service account. |
+| `LDAP_BIND_PASSWORD` | No | The password for that service account. |
+| `LDAP_BASE_DN` | No | Where should I start searching for users? |
+| `LDAP_USER_FILTER` | No | The filter I’ll use for logins (e.g., `(uid=%s)`). |
+| `LDAP_ADMIN_GROUP` | No | The DN of the group that gets full admin access. |
+| `LDAP_VIEWER_GROUP` | No | The DN of the group that only gets read-only access. |
+| `LDAP_GROUP_FILTER` | `(member=%s)` | The LDAP filter I'll use to check for group membership. |
 
-## Scheduler & Retention
+## Scheduler & Data Retention
+
+Txlog Server handles a lot of housekeeping in the background. You can use these
+variables to control how long we keep your history and exactly when these
+background jobs run.
 
 | Variable | Default | Description |
 | :--- | :--- | :--- |
-| `CRON_RETENTION_DAYS` | `7` | Days to keep execution history. |
-| `CRON_RETENTION_EXPRESSION` | `0 2 * * *` | Cron schedule for cleanup job. |
-| `CRON_STATS_EXPRESSION` | `0 * * * *` | Cron schedule for statistics calculation. |
-| `CRON_OSV_EXPRESSION` | `0 4 * * *` | Cron schedule for the OSV vulnerability data sync. |
+| `CRON_RETENTION_DAYS` | `7` | How many days of execution history should we keep? |
+| `CRON_RETENTION_EXPRESSION` | `0 2 * * *` | When should I run the cleanup job? (Standard CRON expression). |
+| `CRON_STATS_EXPRESSION` | `0 * * * *` | How often should I recalculate the dashboard statistics? |
+| `CRON_OSV_EXPRESSION` | `0 4 * * *` | When should I sync the OSV vulnerability data? |

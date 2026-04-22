@@ -1,57 +1,37 @@
-# API Reference
+# Reference: API Overview
 
-This document provides a high-level reference for the Txlog Server API. For interactive documentation and testing, use
-the Swagger UI at `/swagger/index.html`.
+If you're looking to integrate your own tools with Txlog Server or just want to
+explore what’s possible under the hood, you’re in the right place. I’ve designed
+the API to be consistent and easy to work with. While this document gives you a
+high-level overview of how things are structured, I highly recommend checking
+out our interactive Swagger UI at `/swagger/index.html`. It’s the best way to
+see exactly what’s available and even test out some calls in real-time. Ready to
+see what you can build?
 
 ## Base URL
 
-`/v1`
+Every request you make should start with the `/v1` prefix. It’s a standard way
+for me to version the API and ensure that as we grow, your existing integrations
+won't suddenly break.
 
 ## Authentication
 
-- **Header**: `X-API-Key`
-- **Required**: Only if OIDC or LDAP is enabled on the server.
+Security is a top priority, so if you’ve enabled OIDC or LDAP on your server,
+you’ll need to include your API key in the `X-API-Key` header for every request.
+If you're still in local development mode without authentication configured, you
+can skip this for now—but why not test with security enabled from the start?
+It's always better to catch permission issues early.
 
-## Endpoints
+## Error Responses
 
-### Assets (Machines)
+I've chosen to use generic error messages for the API to prevent leaking any
+sensitive internal details about the system to the outside world. If something
+goes wrong, you'll likely see a standard response like these:
 
-| Method | Path | Description | Query Params |
-| :--- | :--- | :--- | :--- |
-| `GET` | `/machines` | List active machines. | `os`, `agent_version` |
-| `GET` | `/machines/ids` | Get machine IDs for a hostname. | `hostname` (Required) |
-| `GET` | `/assets/requiring-restart` | List assets flagged for restart. | - |
+- **500 Internal Server Error**: A catch-all for unexpected failures.
+- **500 Database error**: Specifically for when the server can't talk to the
+    database or a query fails.
 
-### Executions
-
-| Method | Path | Description | Body |
-| :--- | :--- | :--- | :--- |
-| `GET` | `/executions` | List recent executions. | - |
-| `POST` | `/executions` | Report a new execution. | JSON (Execution object) |
-
-### Transactions
-
-| Method | Path | Description | Body |
-| :--- | :--- | :--- | :--- |
-| `GET` | `/transactions` | List transactions. | - |
-| `GET` | `/transactions/ids` | Get transaction IDs. | - |
-| `POST` | `/transactions` | Upload transaction data. | JSON (Transaction object) |
-
-### Packages
-
-| Method | Path | Description | Query Params |
-| :--- | :--- | :--- | :--- |
-| `GET` | `/packages/:name/:version/:release/assets` | List assets with specific package. | - |
-
-### Reports
-
-| Method | Path | Description | Query Params |
-| :--- | :--- | :--- | :--- |
-| `GET` | `/reports/monthly` | Monthly package update report. | `month`, `year` |
-| `GET` | `/reports/anomalies` | Detect unusual transaction patterns. | `days` (1-90), `severity` (low/medium/high) |
-
-### System
-
-| Method | Path | Description |
-| :--- | :--- | :--- |
-| `GET` | `/version` | Get server version. |
+Don't worry, though; the detailed error logs are always available on the server
+for troubleshooting. Have you checked your logs lately? They’re usually the
+first place I look when a request doesn't go as planned.

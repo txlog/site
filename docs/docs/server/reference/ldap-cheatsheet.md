@@ -1,6 +1,16 @@
-# LDAP Authentication - Quick Reference
+# Reference: LDAP Cheatsheet
+
+Setting up LDAP can sometimes feel like you’re trying to solve a puzzle with
+missing pieces. I’ve put together this quick reference to help you get the
+authentication flow working as quickly as possible. Whether you're using a
+standard OpenLDAP setup or a restricted Active Directory environment, you’ll
+find the configuration snippets you need right here. Ready to connect your
+directory?
 
 ## Minimal Configuration WITHOUT Service Account
+
+If your LDAP server allows anonymous searches, you can keep things incredibly
+simple. This is common in many OpenLDAP environments.
 
 ```bash
 # Simplest setup - works if LDAP allows anonymous search
@@ -12,6 +22,9 @@ LDAP_VIEWER_GROUP=cn=viewers,ou=groups,dc=example,dc=com
 
 ## Minimal Configuration WITH Service Account
 
+For more restricted environments—like Active Directory—you’ll usually need a
+service account to perform the initial user search.
+
 ```bash
 # For restricted LDAP servers (like Active Directory)
 LDAP_HOST=ldap.example.com
@@ -22,30 +35,9 @@ LDAP_ADMIN_GROUP=cn=admins,ou=groups,dc=example,dc=com
 LDAP_VIEWER_GROUP=cn=viewers,ou=groups,dc=example,dc=com
 ```
 
-## Full Configuration (All Options)
+## Common Server Snippets
 
-```bash
-# Connection
-LDAP_HOST=ldap.example.com              # Required
-LDAP_PORT=389                           # Default: 389 (636 for LDAPS)
-LDAP_USE_TLS=false                      # Default: false
-LDAP_SKIP_TLS_VERIFY=false              # Default: false
-
-# Service Account (Optional but recommended)
-LDAP_BIND_DN=cn=admin,dc=example,dc=com
-LDAP_BIND_PASSWORD=your_password
-
-# User Search
-LDAP_BASE_DN=ou=users,dc=example,dc=com # Required
-LDAP_USER_FILTER=(uid=%s)               # Default: (uid=%s)
-
-# Authorization Groups (at least one required)
-LDAP_ADMIN_GROUP=cn=admins,ou=groups,dc=example,dc=com
-LDAP_VIEWER_GROUP=cn=viewers,ou=groups,dc=example,dc=com
-LDAP_GROUP_FILTER=(member=%s)           # Default: (member=%s)
-```
-
-## Common LDAP Server Configurations
+Not all LDAP servers are created equal. Do you know which flavor you're running?
 
 ### Active Directory
 
@@ -68,52 +60,74 @@ LDAP_USER_FILTER=(uid=%s)
 LDAP_GROUP_FILTER=(memberUid=%s)
 ```
 
-## Environment Variable Reference
+## Variable Reference
+
+Here’s a quick breakdown of all the variables you can use to fine-tune your
+connection.
 
 | Variable | Required | Default | Description |
-| ---------- | -------- | ------- | ----------- |
-| `LDAP_HOST` | Yes | - | LDAP server hostname |
-| `LDAP_PORT` | No | 389/636 | LDAP server port |
-| `LDAP_USE_TLS` | No | false | Enable TLS connection |
-| `LDAP_SKIP_TLS_VERIFY` | No | false | Skip TLS cert verification |
-| `LDAP_BIND_DN` | No | - | Service account DN (optional) |
-| `LDAP_BIND_PASSWORD` | No | - | Service account password (optional) |
-| `LDAP_BASE_DN` | Yes | - | Base DN for user searches |
-| `LDAP_USER_FILTER` | No | (uid=%s) | User search filter |
-| `LDAP_ADMIN_GROUP` | Yes* | - | Admin group DN |
-| `LDAP_VIEWER_GROUP` | Yes* | - | Viewer group DN |
-| `LDAP_GROUP_FILTER` | No | (member=%s) | Group membership filter |
+| --- | --- | --- | --- |
+| `LDAP_HOST` | Yes | - | Your LDAP server's hostname or IP. |
+| `LDAP_PORT` | No | 389/636 | The port to connect to. |
+| `LDAP_USE_TLS` | No | false | Should we use an encrypted connection? |
+| `LDAP_SKIP_TLS_VERIFY` | No | false | Only use this for testing with self-signed certs! |
+| `LDAP_BIND_DN` | No | - | The DN for your service account. |
+| `LDAP_BIND_PASSWORD` | No | - | The service account's password. |
+| `LDAP_BASE_DN` | Yes | - | Where should I start searching for users? |
+| `LDAP_USER_FILTER` | No | (uid=%s) | The filter I'll use to find the user. |
+| `LDAP_ADMIN_GROUP` | Yes* | - | The group DN for administrators. |
+| `LDAP_VIEWER_GROUP` | Yes* | - | The group DN for read-only viewers. |
+| `LDAP_GROUP_FILTER` | No | (member=%s) | How should I check for group membership? |
 
-\* At least one of `LDAP_ADMIN_GROUP` or `LDAP_VIEWER_GROUP` is required
+*\* You’ve got to provide at least one of these two groups.*
 
-**Note about Service Account**: `LDAP_BIND_DN` and `LDAP_BIND_PASSWORD` are **optional**. If not provided:
+### A Note on Service Accounts
 
-- Anonymous bind will be used for user searches
-- Group membership checks will use the authenticated user's session
-- Works with OpenLDAP and other servers that allow anonymous searches
-- **Active Directory typically requires a service account**
+You don't *always* need `LDAP_BIND_DN` and `LDAP_BIND_PASSWORD`. If you leave
+them out:
 
-## User Roles
+- I'll use an anonymous bind to search for users.
+- I'll use the user’s own authenticated session to check their group membership.
+- This works great for OpenLDAP, but Active Directory almost always insists on a
+  service account.
 
-### Admin Group Members
+## User Roles & Permissions
 
-- View all data
-- Manage assets and packages
-- Access admin panel
-- Create API keys
-- Manage users
+What can your users actually do once they're logged in?
 
-### Viewer Group Members
+### Admins
 
-- View transaction data
-- View assets and packages
-- View insights
-- **No admin access**
+- View all data across the entire system.
+- Manage assets, packages, and users.
+- Access the full admin panel and create API keys.
 
-## Testing LDAP Connection
+### Viewers
+
+- Browse transaction data, assets, and insights.
+- **No access** to the admin panel or any destructive actions.
+
+## Quick Troubleshooting
+
+Something not working? Don't worry, it happens to the best of us. Let's run
+through these common checks:
+
+1. **Connection Refused?** Double-check your `LDAP_HOST` and `LDAP_PORT`. Is
+   there a firewall in the way?
+2. **User Not Found?** Your `LDAP_BASE_DN` or `LDAP_USER_FILTER` might be
+   slightly off.
+3. **Invalid Credentials?** It’s worth double-checking the password—we’ve all
+   been there.
+4. **Not Authorized?** Make sure the user is actually a member of the groups
+   you’ve defined.
+5. **Group Checks Failing?** Your service account might not have the permissions
+   it needs to read the group objects.
+
+### Testing with `ldapsearch`
+
+If you’re stuck, try running this from your terminal to see what the LDAP server
+is returning:
 
 ```bash
-# Test with ldapsearch
 ldapsearch -H ldap://ldap.example.com:389 \
   -D "cn=admin,dc=example,dc=com" \
   -w "password" \
@@ -121,68 +135,23 @@ ldapsearch -H ldap://ldap.example.com:389 \
   "(uid=testuser)"
 ```
 
-## Troubleshooting Quick Checks
+## How the Flow Works
 
-1. **Can't connect**: Check `LDAP_HOST` and `LDAP_PORT`, verify network access
-2. **User not found**: Verify `LDAP_BASE_DN` and `LDAP_USER_FILTER`
-3. **Invalid credentials**: Check username/password in LDAP
-4. **Not authorized**: User not in `LDAP_ADMIN_GROUP` or `LDAP_VIEWER_GROUP`
-5. **Group check fails**: Verify `LDAP_BIND_DN` has read access to groups
+I've designed the authentication flow to be as robust as possible. Here’s what
+happens under the hood when someone tries to log in.
 
-## Authentication Flow
+### Without a Service Account
 
-```text
-WITHOUT Service Account:
-1. User enters username/password
-2. Server connects to LDAP
-3. Server searches for user (anonymous bind)
-4. Server authenticates via LDAP bind with user credentials
-5. Server checks group membership (using authenticated session)
-6. Server creates/updates user in database
-7. Server creates session cookie
-8. User redirected to dashboard
+1. You enter your username and password.
+2. I connect to the LDAP server and search for your DN using an anonymous bind.
+3. Once I find you, I attempt to bind to the server using *your* credentials.
+4. If that works, I use your session to check if you're in the required groups.
+5. Finally, I create your session and let you into the dashboard.
 
-WITH Service Account:
-1. User enters username/password
-2. Server connects to LDAP
-3. Server binds with service account
-4. Server searches for user
-5. Server authenticates user via LDAP bind
-6. Server re-binds with service account
-7. Server checks group membership
-8. Server creates/updates user in database
-9. Server creates session cookie
-10. User redirected to dashboard
-```
+### With a Service Account
 
-## Docker Quick Start
-
-### Without Service Account (OpenLDAP with anonymous search)
-
-```bash
-docker run -d -p 8080:8080 \
-  -e LDAP_HOST=ldap.example.com \
-  -e LDAP_BASE_DN=ou=users,dc=example,dc=com \
-  -e LDAP_ADMIN_GROUP=cn=admins,ou=groups,dc=example,dc=com \
-  -e LDAP_VIEWER_GROUP=cn=viewers,ou=groups,dc=example,dc=com \
-  ghcr.io/txlog/server:main
-```
-
-### With Service Account (Active Directory or restricted LDAP)
-
-```bash
-docker run -d -p 8080:8080 \
-  -e LDAP_HOST=ldap.example.com \
-  -e LDAP_BASE_DN=ou=users,dc=example,dc=com \
-  -e LDAP_BIND_DN=cn=readonly,dc=example,dc=com \
-  -e LDAP_BIND_PASSWORD=your_password \
-  -e LDAP_ADMIN_GROUP=cn=admins,ou=groups,dc=example,dc=com \
-  -e LDAP_VIEWER_GROUP=cn=viewers,ou=groups,dc=example,dc=com \
-  ghcr.io/txlog/server:main
-```
-
-## Documentation Links
-
-- Full Guide: [LDAP_AUTHENTICATION.md](../explanation/ldap-deep-dive.md)
-- Implementation Details: [LDAP_IMPLEMENTATION_SUMMARY.md](../explanation/ldap-implementation-details.md)
-- General Setup: [README.md](../index.md)
+1. You enter your username and password.
+2. I connect and bind immediately using the service account.
+3. I find your user DN and then verify your password with a second bind.
+4. I switch back to the service account to perform the group membership checks.
+5. If everything clears, you're in!
