@@ -74,8 +74,6 @@ things done.
 
 ### Development
 
-- **[Add a New Endpoint](how-to/add-endpoint.md)**: Want to contribute? This is
-  the workflow I follow.
 - **[Run Tests](how-to/run-tests.md)**: Let's make sure everything actually
   works before we ship it.
 
@@ -124,8 +122,6 @@ some background.
   The actual structure of the code itself.
 - **[LDAP Service Accounts FAQ](explanation/ldap-service-account-faq.md)**: Best
   practices for managing those bind accounts.
-- **[Testing Strategy](explanation/testing-strategy.md)**: How I approach
-  testing and what our coverage goals look like.
 
 ## 5. API Documentation
 

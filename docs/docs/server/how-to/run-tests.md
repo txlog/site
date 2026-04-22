@@ -62,7 +62,4 @@ go test ./tests -v
 ```
 
 Once you've got your tests passing, you can be much more confident that your
-changes haven't introduced any unintended side effects. Have you had a chance to
-look at our full [testing strategy](../explanation/testing-strategy.md) yet?
-It’s a great way to understand the "why" behind the way we've structured our
-suite.
+changes haven't introduced any unintended side effects.

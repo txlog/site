@@ -57,7 +57,7 @@ Looking for the technical details? You'll find everything you need right here.
   for your AI assistants.
 * **[Configuration](reference/configuration.md)**: Every parameter you can tweak
   in `txlog.yaml`.
-* **[Environment Variables](reference/environment-variables.md)**: From
+* **[Environment Variables](reference/environment_variables.md)**: From
   `NO_COLOR` to more advanced settings.
 
 ## 4. Explanation
