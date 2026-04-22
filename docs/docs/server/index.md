@@ -33,10 +33,10 @@ docker run -d --name txlog-server \
 If you're just starting out, I've put together some lessons to help you find
 your feet.
 
-- **[Getting Started](tutorials/getting-started.md)**: I'll walk you through
-  setting up the server locally using Docker.
-- **[Your First API Request](tutorials/first-api-request.md)**: Ever wondered
-  how to actually talk to the API? This is where you learn.
+- **[Setup Development Environment](tutorials/setup-dev-environment.md)**:
+  I'll walk you through setting up the server locally.
+- **[First API Request](tutorials/first-api-request.md)**: Learn how to make
+  requests to the API.
 
 ## 2. How-to Guides
 

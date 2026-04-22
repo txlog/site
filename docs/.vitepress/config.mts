@@ -78,8 +78,8 @@ export default defineConfig({
             text: 'Tutorials',
             collapsed: false,
             items: [
-              { text: 'First API Request', link: '/docs/server/tutorials/first-api-request' },
-              { text: 'Getting Started', link: '/docs/server/tutorials/getting-started' }
+              { text: 'Setup Development Environment', link: '/docs/server/tutorials/setup-dev-environment' },
+              { text: 'Your First API Request', link: '/docs/server/tutorials/first-api-request' },
             ]
           },
           {

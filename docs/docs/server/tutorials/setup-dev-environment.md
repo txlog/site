@@ -1,7 +1,8 @@
-# Getting Started with Txlog Server
+# Setup Development Environment
 
-This tutorial will guide you through setting up the Txlog Server development environment on your local machine. By the
-end of this guide, you will have a running server connected to a local database, ready to receive data.
+This tutorial will guide you through setting up the Txlog Server development
+environment on your local machine. By the end of this guide, you will have a
+running server connected to a local database, ready to receive data.
 
 ## Prerequisites
 
@@ -23,7 +24,8 @@ cd server
 
 ## Step 2: Start the Database
 
-Txlog Server requires a PostgreSQL database. The easiest way to run one for development is using Docker.
+Txlog Server requires a PostgreSQL database. The easiest way to run one for
+development is using Docker.
 
 Run the following command to start a Postgres container:
 
@@ -44,8 +46,8 @@ This command:
 
 ## Step 3: Configure the Environment
 
-Create a `.env` file in the root of the project to configure the server. You can copy the following configuration,
-which matches the database we just started:
+Create a `.env` file in the root of the project to configure the server. You can
+copy the following configuration, which matches the database we just started:
 
 ```bash
 # Server Configuration
@@ -69,11 +71,13 @@ CRON_STATS_EXPRESSION=0 * * * *
 CRON_OSV_EXPRESSION=0 4 * * *
 ```
 
-> **Note**: We set `PGSQL_SSLMODE=disable` because the standard Postgres Docker image does not have SSL configured by default.
+> **Note**: We set `PGSQL_SSLMODE=disable` because the standard Postgres Docker
+> image does not have SSL configured by default.
 
 ## Step 4: Install Dependencies and Tools
 
-The project uses `air` for live reloading and `swag` for API documentation. Install them using the provided commands:
+The project uses `air` for live reloading and `swag` for API documentation.
+Install them using the provided commands:
 
 ```bash
 # Install Air (for live reload)
@@ -85,8 +89,8 @@ curl -fsSL https://install.rda.run/swaggo/swag@latest! | bash
 
 ## Step 5: Run the Server
 
-Now you are ready to start the server. Use the `make run` command, which uses `air` to watch for file changes and
-restart the server automatically.
+Now you are ready to start the server. Use the `make run` command, which uses
+`air` to watch for file changes and restart the server automatically.
 
 ```bash
 make run
@@ -109,10 +113,12 @@ Open your web browser and navigate to:
 
 [http://localhost:8080](http://localhost:8080)
 
-You should see the Txlog Server dashboard. Since this is a fresh database, it will be empty, but it confirms the
-application is running and connected to the database.
+You should see the Txlog Server dashboard. Since this is a fresh database, it
+will be empty, but it confirms the application is running and connected to the
+database.
 
 ---
 
-**Next Steps**: Now that your server is running, check out the [Your First API Request](first-api-request.md) tutorial
-to learn how to interact with it programmatically.
+**Next Steps**: Now that your server is running, check out the [Your First API
+Request](first-api-request.md) tutorial to learn how to interact with it
+programmatically.
