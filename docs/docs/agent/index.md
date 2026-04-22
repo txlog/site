@@ -67,6 +67,8 @@ scenes.
 
 * **[Architecture Overview](explanation/architecture_overview.md)**: A look at
   how the whole system fits together.
+* **[Data Collection](explanation/data_collection.md)**: A candid look at exactly
+  what data we gather from your systems and why it matters.
 * **[Data Synchronization](explanation/data_synchronization.md)**: I've
   documented the logic we use to keep everything in sync.
 * **[Design Choices](explanation/design_choices.md)**: Why we chose Go, Cobra,
