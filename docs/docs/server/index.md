@@ -1,17 +1,21 @@
 # Txlog Server Documentation
 
-The Txlog Server is the core component of the platform, responsible for managing
-authentication, persisting transaction logs, and exposing the REST API used by
-agents and user interfaces. It orchestrates communication between services,
-ensuring data integrity and enforcing configured retention and security
-policies.
+I've built the Txlog Server to be the heart of the entire platform. It's where
+the magic happens: handling authentication, keeping your transaction logs safe,
+and providing the REST API that both our agents and UIs depend on. Think of it
+as the conductor of an orchestra, making sure every service stays in sync, data
+remains intact, and your security policies are actually followed.
 
 ## TL;DR
+
+Ready to get moving? You'll need a database first.
 
 ```sql
 -- Create the database
 CREATE DATABASE txlog;
 ```
+
+Once that's sorted, you can fire up the server with a single Docker command.
 
 ```bash
 # Run the server
@@ -26,76 +30,107 @@ docker run -d --name txlog-server \
 
 ## 1. Tutorials
 
-*Learning-oriented lessons for beginners.*
+If you're just starting out, I've put together some lessons to help you find
+your feet.
 
-- **[Getting Started](tutorials/getting-started.md)**: Set up the server locally with Docker.
-- **[Your First API Request](tutorials/first-api-request.md)**: Learn how to interact with the API.
+- **[Getting Started](tutorials/getting-started.md)**: I'll walk you through
+  setting up the server locally using Docker.
+- **[Your First API Request](tutorials/first-api-request.md)**: Ever wondered
+  how to actually talk to the API? This is where you learn.
 
 ## 2. How-to Guides
 
-*Task-oriented guides for specific goals.*
+Got a specific problem to solve? These guides are designed to help you get
+things done.
 
 ### Authentication & Security
 
-- **[Configure OIDC Authentication](how-to/configure-oidc.md)**: Connect with Google, Keycloak, etc.
-- **[Configure LDAP Authentication](how-to/configure-ldap.md)**: Connect with Active Directory or OpenLDAP.
-- **[Configure Anonymous LDAP](how-to/configure-ldap-anonymous.md)**: For servers without service accounts.
-- **[Discover LDAP Filters](how-to/discover-ldap-filters.md)**: How to find the right query filters for your directory.
-- **[Manage API Keys](how-to/manage-api-keys.md)**: Create and revoke keys for agents.
+- **[Configure OIDC Authentication](how-to/configure-oidc.md)**: Need to connect
+  with Google or Keycloak? I've got you covered.
+- **[Configure LDAP Authentication](how-to/configure-ldap.md)**: If you're using
+  Active Directory or OpenLDAP, start here.
+- **[Configure Anonymous LDAP](how-to/configure-ldap-anonymous.md)**: Sometimes
+  you don't have a service account, and that's okay.
+- **[Discover LDAP Filters](how-to/discover-ldap-filters.md)**: Finding the
+  right query filter can be a pain, but it doesn't have to be.
+- **[Manage API Keys](how-to/manage-api-keys.md)**: Here is how you create and
+  revoke keys for your agents.
 
 ### Operations
 
-- **[Configure Data Retention](how-to/configure-data-retention.md)**: Manage database cleanup policies.
-- **[Manage OSV Vulnerabilities](how-to/manage-osv-vulnerabilities.md)**: Update, fetch, and rebuild OSV threat data.
-- **[Run Database Migrations](how-to/run-migrations.md)**: Apply schema changes safely.
-- **[Deploy to Kubernetes](how-to/deploy-kubernetes.md)**: Production deployment manifest.
+- **[Configure Data Retention](how-to/configure-data-retention.md)**: Don't let
+  your database grow forever. Let's set some cleanup policies.
+- **[Manage OSV Vulnerabilities](how-to/manage-osv-vulnerabilities.md)**:
+  Keeping threat data fresh is crucial, isn't it?
+- **[Run Database Migrations](how-to/run-migrations.md)**: Changing your schema
+  shouldn't be scary.
+- **[Deploy to Kubernetes](how-to/deploy-kubernetes.md)**: When you're ready for
+  the big leagues, use this manifest.
 
 ### Reports
 
-- **[Detect Transaction Anomalies](how-to/detect-anomalies.md)**: Detect and manage unusual transactions.
+- **[Detect Transaction Anomalies](how-to/detect-anomalies.md)**: Spotting
+  unusual patterns before they become problems is key.
 
 ### Development
 
-- **[Add a New Endpoint](how-to/add-endpoint.md)**: Workflow for contributors.
-- **[Run Tests](how-to/run-tests.md)**: Execute the test suite.
+- **[Add a New Endpoint](how-to/add-endpoint.md)**: Want to contribute? This is
+  the workflow I follow.
+- **[Run Tests](how-to/run-tests.md)**: Let's make sure everything actually
+  works before we ship it.
 
 ## 3. Reference
 
-*Information-oriented technical descriptions.*
+Looking for the nitty-gritty details? You'll find all the technical specs right
+here.
 
 ### System
 
-- **[API Reference](reference/api-reference.md)**: High-level API overview.
-- **[Database Schema](reference/database-schema.md)**: Tables, columns, and relationships.
-- **[Environment Variables](reference/environment-variables.md)**: Complete configuration reference.
+- **[API Reference](reference/api-reference.md)**: A high-level look at what the
+  API can do.
+- **[Database Schema](reference/database-schema.md)**: Every table, column, and
+  relationship mapped out.
+- **[Environment Variables](reference/environment-variables.md)**: The full list
+  of everything you can configure.
 
 ### LDAP Specifics
 
-- **[LDAP Cheatsheet](reference/ldap-cheatsheet.md)**: Quick reference for variables and common setups.
-- **[LDAP Error Codes](reference/ldap-error-codes.md)**: Troubleshooting common error codes (32, 49, 50).
-- **[LDAP Filters Reference](reference/ldap-filters.md)**: Common filter patterns for AD, OpenLDAP, etc.
+- **[LDAP Cheatsheet](reference/ldap-cheatsheet.md)**: A quick reference for
+  when you just need a variable name.
+- **[LDAP Error Codes](reference/ldap-error-codes.md)**: Troubleshooting codes
+  like 32, 49, or 50? I've been there.
+- **[LDAP Filters Reference](reference/ldap-filters.md)**: Common patterns for
+  the most popular directory services.
 
 ## 4. Explanation
 
-*Understanding-oriented background knowledge.*
+Curious about why things work the way they do? I've written these to give you
+some background.
 
 ### Architecture
 
-- **[System Architecture](explanation/architecture.md)**: High-level design, stack, and distributed scheduler.
-- **[OSV Integration Details](explanation/osv-integration.md)**: How vulnerability fetching, payload batching, and scoring works.
-- **[Data Model](explanation/data-model.md)**: Entities and relationships explanation.
+- **[System Architecture](explanation/architecture.md)**: The "why" behind the
+  design, the tech stack, and our distributed scheduler.
+- **[OSV Integration Details](explanation/osv-integration.md)**: How do we
+  actually fetch and score vulnerabilities? It's all in here.
+- **[Data Model](explanation/data-model.md)**: A closer look at the entities and
+  how they relate to each other.
 
 ### Deep Dives
 
-- **[LDAP Authentication Deep Dive](explanation/ldap-deep-dive.md)**: Comprehensive guide to how LDAP auth works.
-- **[LDAP Implementation Details](explanation/ldap-implementation-details.md)**: Internal code structure of the LDAP module.
-- **[LDAP Service Accounts FAQ](explanation/ldap-service-account-faq.md)**: Best practices for bind accounts.
-- **[Testing Strategy](explanation/testing-strategy.md)**: Overview of the test suite and coverage goals.
+- **[LDAP Authentication Deep Dive](explanation/ldap-deep-dive.md)**: A thorough
+  look at how we handle LDAP under the hood.
+- **[LDAP Implementation Details](explanation/ldap-implementation-details.md)**:
+  The actual structure of the code itself.
+- **[LDAP Service Accounts FAQ](explanation/ldap-service-account-faq.md)**: Best
+  practices for managing those bind accounts.
+- **[Testing Strategy](explanation/testing-strategy.md)**: How I approach
+  testing and what our coverage goals look like.
 
 ## 5. API Documentation
 
-When the server is running, interactive API documentation is available at:
+Once your server is up and running, you can explore the API interactively at:
 `http://localhost:8080/swagger/index.html`
 
-- **Source**: `docs/docs.go` (Generated from code comments)
-- **Update**: Run `make doc` to regenerate.
+I've generated this from the code comments in `docs/docs.go`. If you make
+changes, just run `make doc` to keep everything up to date.

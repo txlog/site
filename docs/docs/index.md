@@ -1,44 +1,52 @@
 # Txlog Architecture Overview
 
-Txlog consists of two main components:
+I've designed Txlog around two main parts that work together to keep your
+package transactions organized. Have you ever wondered where all those DNF logs
+actually go? Well, that's exactly what we're solving here.
 
 ## Server Version
 
-The server component serves as a centralized system that manages the PostgreSQL
-database server, functioning as a repository for transaction data while
-efficiently handling incoming information from multiple agent instances
-throughout the network.
+The server is the brain of the operation. It manages our PostgreSQL database and
+acts as a central hub for all the data coming in from across your network. I've
+built it to handle multiple agent instances at once without breaking a sweat,
+ensuring every piece of transaction data finds its home.
 
-To install and configure, follow the instructions on the [Server Installation
-and Configuration](server/index.md) page.
+If you're ready to get things running, you should check out the [Server
+Installation and Configuration](server/index.md) guide.
 
 ## Agent Version
 
-The agent version is a lightweight client component designed to run on
-RHEL-compatible Linux workstations. It monitors and collects transaction data
-from the DNF (Dandified YUM) package manager, then securely transmits this
-information to the Txlog server for centralized storage and management.
+On the other side, we have the agent. It's a lightweight little piece of
+software that lives on your RHEL-compatible workstations. Its job is simple:
+keep an eye on DNF, grab the transaction data, and send it over to the server
+securely. We've made sure it doesn't get in the way of your actual work while it
+does its thing.
 
-To install and configure, follow the instructions on the [Agent Installation and
-Configuration](agent/index.md) page.
+You can find all the details on setting it up in the [Agent Installation and
+Configuration](agent/index.md) section.
 
 ## Data Flow
 
-The data flow in Txlog follows these key steps:
+So, how does the data actually travel? It's a pretty straightforward process,
+really.
 
-1. The Txlog agent continuously monitors DNF activities on workstations,
-   capturing all package management transactions as they occur.
-2. Each transaction's metadata is parsed and structured, including package
-   names, versions, operation types, and timestamps.
-3. Using secure network protocols, the processed transaction data is encrypted
-   and transmitted from each agent to the central Txlog server.
-4. The Txlog server validates incoming data and permanently stores it in a
-   structured format within the PostgreSQL database for analysis and auditing.
+1. First, the Txlog agent keeps a close watch on DNF activities on your
+   workstations. It catches every transaction the moment it happens.
+2. We then take that transaction metadata and break it down into a structured
+   format—package names, versions, timestamps, you name it.
+3. Next, the agent encrypts that data and sends it over the network using secure
+   protocols. We wouldn't want that info floating around in the clear, would we?
+4. Finally, the server takes that incoming data, validates it, and tucks it away
+   safely in the PostgreSQL database for whenever you need to audit it.
 
 ## Disclaimer
 
-* Logbook icon created by [smashingstocks](https://www.flaticon.com/authors/smashingstocks), available on [Flaticon](https://www.flaticon.com/free-icons/logbook).
+* Logbook icon created by
+  [smashingstocks](https://www.flaticon.com/authors/smashingstocks), available
+  on [Flaticon](https://www.flaticon.com/free-icons/logbook).
 * PostgreSQL is a trademark of The PostgreSQL Global Development Group.
-* RPM, DNF and RHEL are trademarks of Red Hat, Inc., registered in the United States and other countries.
-* Linux is a registered trademark of Linus Torvalds in the U.S. and other countries.
+* RPM, DNF and RHEL are trademarks of Red Hat, Inc., registered in the United
+  States and other countries.
+* Linux is a registered trademark of Linus Torvalds in the U.S. and other
+  countries.
 * All other trademarks are the property of their respective owners.

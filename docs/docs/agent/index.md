@@ -1,12 +1,14 @@
 # Txlog Agent Documentation
 
-The Txlog Agent is a specialized utility designed to compile transactional data
-from RPM-based systems and securely transmit it to a centralized server. By
-automating the collection and reporting of system changes, it enables
-comprehensive monitoring and analytics, providing administrators with a unified
-view of their infrastructure's state and history.
+I've built the Txlog Agent to take the headache out of tracking system changes
+on RPM-based machines. It's a specialized tool that gathers up your
+transactional data and sends it over to a central server. Why bother doing this
+manually? By automating the whole process, I've made it easy for you to see
+exactly what's happening across your entire infrastructure from one place.
 
 ## TL;DR
+
+If you're in a hurry, here is how you get it up and running.
 
 ```bash
 # Install
@@ -20,56 +22,61 @@ sudo nano /etc/txlog.yaml
 txlog build
 ```
 
-## 1. [Tutorials](tutorials/getting_started.md)
+## 1. Tutorials
 
-*Learning-oriented lessons for beginners.*
+Just getting started? I've put together these lessons to help you get the hang
+of things.
 
-* **[Getting Started](tutorials/getting_started.md)**: A hands-on guide to
-    installing, configuring, and running the agent for the first time.
-* **[MCP Getting Started](tutorials/mcp_getting_started.md)**: Set up the MCP
-    server to use AI assistants with your infrastructure.
+* **[Getting Started](tutorials/getting_started.md)**: I'll walk you through the
+  first installation and setup.
+* **[MCP Getting Started](tutorials/mcp_getting_started.md)**: Learn how to
+  connect your AI assistants to your infrastructure using the MCP server.
 
-## 2. [How-to Guides](how-to/configure_authentication.md)
+## 2. How-to Guides
 
-*Task-oriented guides for specific goals.*
+Got a specific goal in mind? These guides will show you exactly how to reach it.
 
-* **[Configure Authentication](how-to/configure_authentication.md)**: Set up
-    API Keys or Basic Auth.
-* **[Verify Data Integrity](how-to/verify_data_integrity.md)**: Ensure local
-    and server data match.
-* **[Run in CI/CD](how-to/run_in_cicd.md)**: Use the agent in automated
-    pipelines with `NO_COLOR`.
-* **[Secure Configuration](how-to/secure_configuration.md)**: Protect your
-    credentials.
-* **[Configure MCP with SSE](how-to/configure_mcp_sse.md)**: Run the MCP server
-    with SSE transport for web clients.
+* **[Configure Authentication](how-to/configure_authentication.md)**: I'll show
+  you how to set up API keys or basic auth.
+* **[Verify Data Integrity](how-to/verify_data_integrity.md)**: It's important
+  to know your local and server data match, isn't it?
+* **[Run in CI/CD](how-to/run_in_cicd.md)**: Using the agent in automated
+  pipelines is a breeze.
+* **[Secure Configuration](how-to/secure_configuration.md)**: Let's make sure
+  your credentials stay private.
+* **[Configure MCP with SSE](how-to/configure_mcp_sse.md)**: Setting up the MCP
+  server for web clients is easier than you think.
 
-## 3. [Reference](reference/cli_commands.md)
+## 3. Reference
 
-*Information-oriented technical descriptions.*
+Looking for the technical details? You'll find everything you need right here.
 
-* **[CLI Commands](reference/cli_commands.md)**: `build`, `verify`,
-    `version`.
-* **[MCP Tools](reference/mcp_tools.md)**: Available tools and prompts for AI
-    assistants.
-* **[Configuration](reference/configuration.md)**: `txlog.yaml` parameters.
-* **[Environment Variables](reference/environment_variables.md)**: `NO_COLOR`
-    and others.
+* **[CLI Commands](reference/cli_commands.md)**: A complete list of commands
+  like `build`, `verify`, and `version`.
+* **[MCP Tools](reference/mcp_tools.md)**: All the tools and prompts available
+  for your AI assistants.
+* **[Configuration](reference/configuration.md)**: Every parameter you can tweak
+  in `txlog.yaml`.
+* **[Environment Variables](reference/environment-variables.md)**: From
+  `NO_COLOR` to more advanced settings.
 
-## 4. [Explanation](explanation/architecture_overview.md)
+## 4. Explanation
 
-*Understanding-oriented background knowledge.*
+Ever wonder why we built things the way we did? These pages go behind the
+scenes.
 
-* **[Architecture Overview](explanation/architecture_overview.md)**: How the
-    system works.
-* **[Data Synchronization](explanation/data_synchronization.md)**: The logic
-    behind the sync process.
-* **[Design Choices](explanation/design_choices.md)**: Why we chose Go,
-    Cobra, and Regex.
-* **[MCP Integration](explanation/mcp_integration.md)**: How and why the Model
-    Context Protocol was integrated.
+* **[Architecture Overview](explanation/architecture_overview.md)**: A look at
+  how the whole system fits together.
+* **[Data Synchronization](explanation/data_synchronization.md)**: I've
+  documented the logic we use to keep everything in sync.
+* **[Design Choices](explanation/design_choices.md)**: Why we chose Go, Cobra,
+  and Regex for this project.
+* **[MCP Integration](explanation/mcp_integration.md)**: The "why" and "how" of
+  our Model Context Protocol integration.
 
 ## Quick Links
 
-* **Project Repository**: [github.com/txlog/agent](https://github.com/txlog/agent)
-* **Issue Tracker**: [github.com/txlog/agent/issues](https://github.com/txlog/agent/issues)
+* **Project Repository**:
+  [github.com/txlog/agent](https://github.com/txlog/agent)
+* **Issue Tracker**:
+  [github.com/txlog/agent/issues](https://github.com/txlog/agent/issues)
