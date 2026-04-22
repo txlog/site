@@ -85,7 +85,6 @@ export default defineConfig({
             text: 'How-to',
             collapsed: true,
             items: [
-              { text: 'Add Endpoint', link: '/docs/server/how-to/add-endpoint' },
               { text: 'Configure Data Retention', link: '/docs/server/how-to/configure-data-retention' },
               { text: 'Configure LDAP Anonymous', link: '/docs/server/how-to/configure-ldap-anonymous' },
               { text: 'Configure LDAP', link: '/docs/server/how-to/configure-ldap' },
@@ -120,8 +119,7 @@ export default defineConfig({
               { text: 'LDAP Deep Dive', link: '/docs/server/explanation/ldap-deep-dive' },
               { text: 'LDAP Implementation Details', link: '/docs/server/explanation/ldap-implementation-details' },
               { text: 'LDAP Service Account FAQ', link: '/docs/server/explanation/ldap-service-account-faq' },
-              { text: 'OSV Integration', link: '/docs/server/explanation/osv-integration' },
-              { text: 'Testing Strategy', link: '/docs/server/explanation/testing-strategy' }
+              { text: 'OSV Integration', link: '/docs/server/explanation/osv-integration' }
             ]
           }
         ]
