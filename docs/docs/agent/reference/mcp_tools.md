@@ -1,8 +1,8 @@
 <!-- markdownlint-disable MD033 MD013 -->
 # MCP Tools Reference
 
-This document provides a technical reference for the tools available through
-the Txlog MCP server.
+This document provides a technical reference for the tools available through the
+Txlog MCP server.
 
 ## Requirements
 
@@ -28,6 +28,7 @@ List datacenter servers with optional OS/version filters.
 | :--- | :--- | :--- | :--- |
 | `os` | string | No | Filter by operating system (e.g., "AlmaLinux") |
 | `version` | string | No | Filter by OS version (e.g., "9.4") |
+| `vulnerable` | boolean | No | Filter only assets with critical vulnerabilities (e.g., CVE-2026-31431) |
 
 **Example Query:** "List all servers running AlmaLinux 9"
 
@@ -78,7 +79,19 @@ Get package changes in a specific transaction.
 | :--- | :--- | :--- | :--- |
 | `transaction_id` | string | Yes | Transaction ID |
 
-**Example Query:** "What packages were changed in transaction abc123?"
+### `get_transaction_vulnerabilities`
+
+List known security vulnerabilities (CVEs) fixed or introduced in a specific
+transaction.
+
+**Arguments:**
+
+| Name | Type | Required | Description |
+| :--- | :--- | :--- | :--- |
+| `machine_id` | string | Yes | Server machine ID |
+| `transaction_id` | integer | Yes | Transaction ID |
+
+**Example Query:** "Are there any CVEs fixed in transaction 123 on dbserver01?"
 
 ---
 
@@ -89,6 +102,17 @@ List servers that need to be restarted after package updates.
 **Arguments:** None
 
 **Example Query:** "Which servers need to be restarted?"
+
+---
+
+### `get_vulnerable_assets`
+
+List servers affected by critical security vulnerabilities (e.g.,
+CVE-2026-31431).
+
+**Arguments:** None
+
+**Example Query:** "Show me all servers vulnerable to Copy Fail"
 
 ---
 

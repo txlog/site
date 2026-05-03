@@ -46,6 +46,8 @@ Got a specific goal in mind? These guides will show you exactly how to reach it.
   your credentials stay private.
 * **[Configure MCP with SSE](how-to/configure_mcp_sse.md)**: Setting up the MCP
   server for web clients is easier than you think.
+* **[Detect Copy Fail Vulnerability](how-to/detect-copy-fail-vulnerability.md)**:
+  Diagnose CVE-2026-31431 on your servers using a safe, non-destructive tool.
 
 ## 3. Reference
 
@@ -75,6 +77,8 @@ scenes.
   and Regex for this project.
 * **[MCP Integration](explanation/mcp_integration.md)**: The "why" and "how" of
   our Model Context Protocol integration.
+* **[Copy Fail Detection Logic](explanation/copy-fail-detection.md)**: A deep
+  dive into how we safely detect kernel vulnerabilities like CVE-2026-31431.
 
 ## Quick Links
 

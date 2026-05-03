@@ -44,8 +44,8 @@ presents the results in a human-readable format.
 1. **AI Assistant**: The client application (Claude Desktop, Gemini CLI) that
    sends natural language queries.
 
-2. **Txlog Agent (MCP Server)**: Exposes tools and prompts via the MCP
-   protocol. Receives tool invocations and translates them into API calls.
+2. **Txlog Agent (MCP Server)**: Exposes tools and prompts via the MCP protocol.
+   Receives tool invocations and translates them into API calls.
 
 3. **Txlog Server**: The data source providing asset information, transaction
    history, and analytics via REST API.
@@ -82,15 +82,17 @@ Tools are functions that the AI can call to retrieve data or perform actions.
 They are discoverable and self-describing, allowing the AI to understand what
 parameters are needed and what data will be returned.
 
-Example: `list_assets` retrieves a list of servers, optionally filtered by OS.
+Example: `list_assets` retrieves a list of servers, optionally filtered by OS or
+vulnerability status.
 
 ### Prompts
 
 Prompts are pre-built templates for complex workflows. They guide the AI through
 multi-step analysis tasks.
 
-Example: `security_audit` combines multiple tool calls to produce a
-comprehensive security assessment.
+Example: `security_audit` combines multiple tool calls, including checks for
+**CVE-2026-31431 (Copy Fail)** and transaction-level vulnerability reports, to
+produce a comprehensive security assessment.
 
 ## Security Considerations
 

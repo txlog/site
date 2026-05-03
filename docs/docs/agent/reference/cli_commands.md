@@ -66,3 +66,28 @@ txlog version [flags]
 | Code | Description |
 | :--- | :--- |
 | `0` | Success. |
+| `1` | Error checking versions. |
+
+### `txlog copyfail`
+
+Performs a diagnostic check for the CVE-2026-31431 (Copy Fail) vulnerability on
+the local system.
+
+**Usage:**
+
+```bash
+txlog copyfail [flags]
+```
+
+**Output:**
+
+- **GREEN**: System is NOT vulnerable (kernel is patched).
+- **RED**: System IS vulnerable. It will also indicate if a privilege escalation
+  path was confirmed (Phase 2).
+
+**Exit Codes:**
+
+| Code | Description |
+| :--- | :--- |
+| `0` | Success. The check was performed successfully (regardless of vulnerability status). |
+| `1` | Error. Failed to perform the diagnostic check (e.g., restricted permissions or missing system capabilities). |

@@ -73,8 +73,8 @@ vulns_fixed = (unique CVEs in old packages) − (unique CVEs in new packages)
 
 - **Fixed**: A vulnerable package was removed or upgraded. Those CVEs are no
     longer on your system.
-- **Introduced**: This is what we want to avoid. It happens when a package
-    with known vulnerabilities is installed or downgraded to.
+- **Introduced**: This is what we want to avoid. It happens when a package with
+    known vulnerabilities is installed or downgraded to.
 
 ## Severity and Details
 
@@ -87,3 +87,20 @@ dropdown on the transaction row in the asset details page. It’ll open a modal
 listing every associated CVE, its severity, and whether it was fixed or
 introduced. If there’s no vulnerability data for a transaction, we’ll simply
 disable that option to keep the UI clean.
+
+## Special Case: CVE-2026-31431 (Copy Fail)
+
+Unlike standard vulnerabilities that I pull from the OSV database based on
+package names and versions, **CVE-2026-31431** is handled differently.
+
+Because this specific kernel bug can be present even in seemingly "patched"
+versions due to configuration or backports, the Txlog Agent performs a **live,
+behavioral test** on each system.
+
+1. **Detection**: The agent attempts a non-destructive write to the page cache
+   to verify if the vulnerability exists.
+2. **Reporting**: This status is sent to the server independently of the OSV
+   package sync.
+3. **Visualization**: Systems vulnerable to Copy Fail are marked with a distinct
+   **🚨 Critical (Coral Pulse)** badge on the dashboard, as they represent a
+   higher risk (privilege escalation) than standard package vulnerabilities.
