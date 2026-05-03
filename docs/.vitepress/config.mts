@@ -95,6 +95,7 @@ export default defineConfig({
               { text: 'Discover LDAP Filters', link: '/docs/server/how-to/discover-ldap-filters' },
               { text: 'Manage API Keys', link: '/docs/server/how-to/manage-api-keys' },
               { text: 'Manage OSV Vulnerabilities', link: '/docs/server/how-to/manage-osv-vulnerabilities' },
+              { text: 'Search and Filter Assets', link: '/docs/server/how-to/search-and-filter-assets' },
               { text: 'Run Migrations', link: '/docs/server/how-to/run-migrations' },
               { text: 'Run Tests', link: '/docs/server/how-to/run-tests' }
             ]

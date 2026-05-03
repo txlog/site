@@ -62,6 +62,8 @@ things done.
   your database grow forever. Let's set some cleanup policies.
 - **[Manage OSV Vulnerabilities](how-to/manage-osv-vulnerabilities.md)**:
   Keeping threat data fresh is crucial, isn't it?
+- **[Search and Filter Assets](how-to/search-and-filter-assets.md)**:
+  How to use the dashboard search bar and status filters.
 - **[Run Database Migrations](how-to/run-migrations.md)**: Changing your schema
   shouldn't be scary.
 - **[Deploy to Kubernetes](how-to/deploy-kubernetes.md)**: When you're ready for
