@@ -92,6 +92,8 @@ here.
   relationship mapped out.
 - **[Environment Variables](reference/environment-variables.md)**: The full list
   of everything you can configure.
+- **[Search Keywords Reference](reference/search-keywords.md)**: All the magic
+  keywords you can use in the asset search bar.
 
 ### LDAP Specifics
 
@@ -115,6 +117,8 @@ some background.
   actually fetch and score vulnerabilities? It's all in here.
 - **[Data Model](explanation/data-model.md)**: A closer look at the entities and
   how they relate to each other.
+- **[How Search Works](explanation/how-search-works.md)**: Understanding the
+  internal logic behind asset search and filtering.
 
 ### Deep Dives
 
