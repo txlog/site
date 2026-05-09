@@ -20,12 +20,12 @@ Once that's sorted, you can fire up the server with a single Docker command.
 ```bash
 # Run the server
 docker run -d --name txlog-server \
-  -e PGSQL_HOST=db.example.com \
-  -e PGSQL_USER=txlog \
-  -e PGSQL_PASSWORD=txlog \
-  -e PGSQL_DB=txlog \
-  -p 8080:8080 \
-  ghcr.io/txlog/server:main
+-e PGSQL_HOST=db.example.com \
+-e PGSQL_USER=txlog \
+-e PGSQL_PASSWORD=txlog \
+-e PGSQL_DB=txlog \
+-p 8080:8080 \
+ghcr.io/txlog/server:main
 ```
 
 ## 1. Tutorials
@@ -36,7 +36,7 @@ your feet.
 - **[Setup Development Environment](tutorials/setup-dev-environment.md)**:
   I'll walk you through setting up the server locally.
 - **[First API Request](tutorials/first-api-request.md)**: Learn how to make
-  requests to the API.
+requests to the API.
 
 ## 2. How-to Guides
 
@@ -46,38 +46,44 @@ things done.
 ### Authentication & Security
 
 - **[Configure OIDC Authentication](how-to/configure-oidc.md)**: Need to connect
-  with Google or Keycloak? I've got you covered.
+with Google or Keycloak? I've got you covered.
 - **[Configure LDAP Authentication](how-to/configure-ldap.md)**: If you're using
-  Active Directory or OpenLDAP, start here.
+Active Directory or OpenLDAP, start here.
 - **[Configure Anonymous LDAP](how-to/configure-ldap-anonymous.md)**: Sometimes
-  you don't have a service account, and that's okay.
+you don't have a service account, and that's okay.
 - **[Discover LDAP Filters](how-to/discover-ldap-filters.md)**: Finding the
-  right query filter can be a pain, but it doesn't have to be.
+right query filter can be a pain, but it doesn't have to be.
+- **[Secure Deployment](how-to/secure-deployment.md)**: Best practices for
+hardening your production environment.
 - **[Manage API Keys](how-to/manage-api-keys.md)**: Here is how you create and
-  revoke keys for your agents.
+revoke keys for your agents.
 
 ### Operations
 
 - **[Configure Data Retention](how-to/configure-data-retention.md)**: Don't let
-  your database grow forever. Let's set some cleanup policies.
+your database grow forever. Let's set some cleanup policies.
+- **[Configure Topology Templates](how-to/configure-topology-templates.md)**:
+Automate asset identification using hostname patterns.
 - **[Manage OSV Vulnerabilities](how-to/manage-osv-vulnerabilities.md)**:
-  Keeping threat data fresh is crucial, isn't it?
+Keeping threat data fresh is crucial, isn't it?
+- **[Manage Inactive Servers](how-to/manage-inactive-servers.md)**: Cleaning up
+the dashboard by removing servers that no longer report.
 - **[Search and Filter Assets](how-to/search-and-filter-assets.md)**:
-  How to use the dashboard search bar and status filters.
+How to use the dashboard search bar and status filters.
 - **[Run Database Migrations](how-to/run-migrations.md)**: Changing your schema
-  shouldn't be scary.
+shouldn't be scary.
 - **[Deploy to Kubernetes](how-to/deploy-kubernetes.md)**: When you're ready for
-  the big leagues, use this manifest.
+the big leagues, use this manifest.
 
 ### Reports
 
 - **[Detect Transaction Anomalies](how-to/detect-anomalies.md)**: Spotting
-  unusual patterns before they become problems is key.
+unusual patterns before they become problems is key.
 
 ### Development
 
 - **[Run Tests](how-to/run-tests.md)**: Let's make sure everything actually
-  works before we ship it.
+works before we ship it.
 
 ## 3. Reference
 
@@ -87,22 +93,22 @@ here.
 ### System
 
 - **[API Reference](reference/api-reference.md)**: A high-level look at what the
-  API can do.
+API can do.
 - **[Database Schema](reference/database-schema.md)**: Every table, column, and
-  relationship mapped out.
+relationship mapped out.
 - **[Environment Variables](reference/environment-variables.md)**: The full list
-  of everything you can configure.
+of everything you can configure.
 - **[Search Keywords Reference](reference/search-keywords.md)**: All the magic
-  keywords you can use in the asset search bar.
+keywords you can use in the asset search bar.
 
 ### LDAP Specifics
 
 - **[LDAP Cheatsheet](reference/ldap-cheatsheet.md)**: A quick reference for
-  when you just need a variable name.
+when you just need a variable name.
 - **[LDAP Error Codes](reference/ldap-error-codes.md)**: Troubleshooting codes
-  like 32, 49, or 50? I've been there.
+like 32, 49, or 50? I've been there.
 - **[LDAP Filters Reference](reference/ldap-filters.md)**: Common patterns for
-  the most popular directory services.
+the most popular directory services.
 
 ## 4. Explanation
 
@@ -112,22 +118,26 @@ some background.
 ### Architecture
 
 - **[System Architecture](explanation/architecture.md)**: The "why" behind the
-  design, the tech stack, and our distributed scheduler.
+design, the tech stack, and our distributed scheduler.
+- **[Topology Matching Engine](explanation/topology-matching-engine.md)**: How we
+dynamically identify environments and services.
 - **[OSV Integration Details](explanation/osv-integration.md)**: How do we
-  actually fetch and score vulnerabilities? It's all in here.
+actually fetch and score vulnerabilities? It's all in here.
 - **[Data Model](explanation/data-model.md)**: A closer look at the entities and
-  how they relate to each other.
+how they relate to each other.
 - **[How Search Works](explanation/how-search-works.md)**: Understanding the
-  internal logic behind asset search and filtering.
+internal logic behind asset search and filtering.
 
 ### Deep Dives
 
+- **[Copy Fail Detection](explanation/copy-fail-detection.md)**: Technical
+deep dive into CVE-2026-31431 and our safety guarantees.
 - **[LDAP Authentication Deep Dive](explanation/ldap-deep-dive.md)**: A thorough
-  look at how we handle LDAP under the hood.
+look at how we handle LDAP under the hood.
 - **[LDAP Implementation Details](explanation/ldap-implementation-details.md)**:
-  The actual structure of the code itself.
+The actual structure of the code itself.
 - **[LDAP Service Accounts FAQ](explanation/ldap-service-account-faq.md)**: Best
-  practices for managing those bind accounts.
+practices for managing those bind accounts.
 
 ## 5. API Documentation
 

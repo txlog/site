@@ -1,102 +1,123 @@
 # Architecture Overview
 
-I've designed the Txlog Server to be the central hub of our logging operations.
-Its primary role is to collect, store, and visualize data from our distributed
-agents. Why did we choose a centralized approach? It's simply the most efficient
-way to maintain a cohesive view of everything happening across the entire fleet.
+Txlog Server is a centralized system designed to collect, store, and visualize
+transaction logs and asset data from
+distributed agents.
 
 ## High-Level Architecture
 
-The system relies on a classic **Client-Server** model. It's a proven
-architecture that ensures reliability without adding unnecessary complexity:
+The system follows a classic **Client-Server** architecture:
 
-1. **Agents (Clients)**: These are installed on our servers (specifically Linux
-    RPM-based systems). They're responsible for collecting DNF/YUM transaction
-    history and system metadata, which they then push to the server via
-    HTTP/JSON.
-2. **Server**: A monolithic Go application. It's the component that receives
-    the data, processes it, and ensures it's stored safely in our relational
-    database.
-3. **Database**: We use PostgreSQL as the single source of truth for all our
-    data.
+1. **Agents (Clients)**: Installed on servers (Linux RPM-based). They collect DNF/YUM transaction history and system
+   metadata and push it to the server via HTTP/JSON.
+2. **Server**: A monolithic Go application that receives data, processes it, and
+stores it in a relational database.
+3. **Database**: PostgreSQL serves as the single source of truth for all data.
+
+```mermaid
+graph LR
+    A[Agent 1] -->|HTTP POST| LB[Load Balancer]
+    B[Agent 2] -->|HTTP POST| LB
+    LB --> S[Txlog Server]
+    S -->|SQL| DB[(PostgreSQL)]
+```
+
+## Technology Stack
+
+- **Language**: Go (Golang) 1.22+
+- **Web Framework**: Gin (High-performance HTTP web framework)
+- **Database**: PostgreSQL 13+
+- **Frontend**: Server-side rendered HTML (Go Templates) with vanilla CSS/JS.
+- **Scheduling**: Internal Go routines with distributed locking.
 
 ## Key Design Decisions
 
 ### 1. Asset Management (Logical vs. Physical Identity)
 
-One of the key challenges I wanted to address was how we distinguish between a
-*logical* server (like "web-01") and its actual *physical* hardware.
+One of the core challenges in infrastructure monitoring is distinguishing
+between a _logical_ server (e.g., "web-01")
+and its _physical_ instantiation.
 
-- **The Problem**: If a server like "web-01" is re-imaged, it generates a
-    brand new `/etc/machine-id`. In a simpler system, this would look like a
-    completely new server, which would unfortunately break your history.
-- **The Solution**: We developed the `AssetManager` to handle this. It uses
-    specific logic to link the `hostname` (the logical ID) with the `machine_id`
-    (the physical ID).
-  - When a new `machine_id` reports with an existing `hostname`, the system
-   recognizes the change and automatically deactivates the old asset while
-   starting a new one.
-  - This approach lets us keep the history of "web-01" intact, even across
-   full re-installations.
+- **Problem**: If "web-01" is re-imaged, it generates a new `/etc/machine-id`. To a naive system, this looks like a new
+server, breaking history continuity.
+- **Solution**: The `AssetManager` (`models/asset_manager.go`) implements a logic to link `hostname` (logical ID) with
+`machine_id` (physical ID).
+- When a new `machine_id` reports with an existing `hostname`, the system
+automatically "deactivates" the old asset
+    and creates a new active one.
+- This preserves the history of "web-01" across re-installations while
+maintaining an accurate audit trail of physical
+    changes.
 
 ### 2. Distributed Scheduler
 
-We've included a built-in scheduler for essential background tasks, such as
-cleaning up old data or calculating statistics.
+The server includes a built-in scheduler (`scheduler/main.go`) for background
+tasks like data retention cleanup and
+statistics calculation.
 
-- **The Challenge**: If you're running this in a high-availability
-    environment—like Kubernetes with multiple replicas—how do you prevent every
-    instance from running the same job at once?
-- **The Solution**: We've implemented **Distributed Locking via the
-    Database**.
-  - Before any instance starts a job, it must acquire a named lock in our
-   `cron_lock` table.
-  - Only the instance that successfully secures the lock proceeds with the
-   job. It's a simple, robust solution that doesn't require us to manage
-   extra dependencies like Redis.
+- **Challenge**: In a high-availability deployment (e.g., Kubernetes with 3 replicas), we cannot have all 3 instances
+running the cleanup job simultaneously.
+- **Solution**: **Distributed Locking via Database**.
+- Before running a job, the instance attempts to acquire a named lock in the
+`cron_lock` table
+    (`INSERT ... ON CONFLICT DO NOTHING`).
+- Only the instance that successfully inserts the row executes the job.
+- This allows the scheduler to be simple (no external dependencies like Redis)
+yet robust for clustered deployments.
 
-### 3. Authentication Strategy
+### 3. Context-Aware Database Operations
 
-We wanted to offer enough flexibility to cover several different deployment
-scenarios:
+To ensure system resilience under heavy load and prevent resource exhaustion:
 
-- **OIDC/LDAP**: This is the standard for human users. It integrates directly
-    with your enterprise identity providers for secure web access.
-- **No-Auth Mode**: This is primarily intended for local development or
-    isolated networks. It's there to remove friction when you're just getting
-    started with a new setup.
+- All database queries and transactions are strictly context-aware (`QueryContext`, `BeginTx`).
+- This allows operations to be immediately canceled if the client disconnects or if a request times out, preventing
+goroutine leaks and database connection pool starvation.
+- The architecture uses dependency injection for database connections, decoupling controllers and scheduled jobs from
+global state and improving testability.
+
+### 4. Authentication Strategy
+
+The system supports a hybrid authentication model to cater to different user
+needs:
+
+- **OIDC/LDAP**: For Humans (web interface). Integrates with enterprise identity providers.
+- **No-Auth Mode**: For local development or isolated networks, reducing friction during initial setup.
 
 ## Security Principles
 
-Security isn't something we take lightly. I've implemented several layers of
-hardening to ensure the system remains secure:
+The server implements several layers of security hardening:
 
-1. **Cookie Security**: All session cookies use the `SameSite=Lax` policy.
-    Furthermore, when the server is running in production mode, we enforce the
-    `Secure` flag on all cookies.
-2. **CSRF Mitigation**: Any operation that modifies state must use a `POST`
-    request. Combined with our cookie policies, this provides a solid defense
-    against CSRF attacks.
-3. **Strict Error Handling**: We're quite careful about what information we
-    expose. API responses use generic messages, ensuring that sensitive database
-    or internal details remain only in the server logs.
-4. **Mandatory TLS**: We don't allow "skip verify" modes for external
-    connections. The server always verifies TLS certificates when connecting to
-    OIDC or LDAP providers.
-5. **RBAC**: Destructive operations—like deleting assets or running
-    migrations—are strictly limited to the Administrator role.
-6. **Credential Masking**: Any sensitive configuration values are masked in the
-    UI with fixed-length strings. This prevents anyone from even guessing the
-    length of your credentials.
+1. **Cookie Security**: All session and authentication cookies are protected with `SameSite=Lax`. When the server is
+   running in production mode (`GIN_MODE=release`), cookies are also marked as `Secure`.
+2. **CSRF Mitigation**: State-mutating operations use `POST` requests, which are
+protected by the `SameSite=Lax` cookie
+   policy.
+3. **No-Leak Error Handling**: API responses to clients use generic error
+messages. Detailed database or internal errors
+   are only visible in server-side logs.
+4. **Mandatory TLS Verification**: The server always verifies TLS certificates
+when connecting to external OIDC
+   providers or LDAP servers. Insecure "skip verify" modes are not supported.
+5. **RBAC for Destructive Actions**: Destructive operations, such as deleting an
+asset or running database migrations,
+   are strictly restricted to the Administrator role.
+6. **Credential Masking**: Sensitive configuration values are masked in the UI
+with fixed-length strings to prevent
+   leaking credential lengths.
 
-### The Ingestion Pipeline
+### Ingestion Pipeline
 
-When an agent sends data, it follows a clear path:
+1. **Agent** sends a JSON payload to `/v1/executions`.
+2. **Controller** (`controllers/api/v1/executions_controller.go`) validates the
+JSON.
+3. **Asset Manager** updates the asset state (create/update/replace).
+4. **Transaction Manager** inserts new transactions and links them to the asset.
+5. **Response**: Server returns 200 OK.
 
-1. The **Agent** sends a JSON payload to our `/v1/executions` endpoint.
-2. The **Controller** performs a quick validation to ensure the data is
-    well-formed.
-3. The **Asset Manager** updates the state of the asset.
-4. The **Transaction Manager** records the new transactions and links them
-    appropriately.
-5. The **Server** responds with a 200 OK once the process is complete.
+### Visualization
+
+1. **User** requests the dashboard (`/`).
+2. **Controller** queries the database for aggregated statistics (cached for
+performance).
+3. **Template Engine** renders the HTML with the data.
+4. **Browser** displays the page (no client-side fetching for initial load).
