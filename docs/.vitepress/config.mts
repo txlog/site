@@ -31,8 +31,7 @@ export default defineConfig({
             text: 'Tutorials',
             collapsed: false,
             items: [
-              { text: 'Getting Started', link: '/docs/agent/tutorials/getting_started' },
-              { text: 'MCP Getting Started', link: '/docs/agent/tutorials/mcp_getting_started' }
+              { text: 'Getting Started', link: '/docs/agent/tutorials/getting_started' }
             ]
           },
           {
@@ -40,7 +39,6 @@ export default defineConfig({
             collapsed: true,
             items: [
               { text: 'Configure Authentication', link: '/docs/agent/how-to/configure_authentication' },
-              { text: 'Configure MCP SSE', link: '/docs/agent/how-to/configure_mcp_sse' },
               { text: 'Run in CI/CD', link: '/docs/agent/how-to/run_in_cicd' },
               { text: 'Secure Configuration', link: '/docs/agent/how-to/secure_configuration' },
               { text: 'Verify Data Integrity', link: '/docs/agent/how-to/verify_data_integrity' }
@@ -52,9 +50,7 @@ export default defineConfig({
             items: [
               { text: 'CLI Commands', link: '/docs/agent/reference/cli_commands' },
               { text: 'Configuration', link: '/docs/agent/reference/configuration' },
-              { text: 'Environment Variables', link: '/docs/agent/reference/environment_variables' },
-              { text: 'MCP Tools', link: '/docs/agent/reference/mcp_tools' }
-            ]
+              { text: 'Environment Variables', link: '/docs/agent/reference/environment_variables' }]
           },
           {
             text: 'Explanation',
@@ -63,9 +59,7 @@ export default defineConfig({
               { text: 'Architecture Overview', link: '/docs/agent/explanation/architecture_overview' },
               { text: 'Data Collection', link: '/docs/agent/explanation/data_collection' },
               { text: 'Data Synchronization', link: '/docs/agent/explanation/data_synchronization' },
-              { text: 'Design Choices', link: '/docs/agent/explanation/design_choices' },
-              { text: 'MCP Integration', link: '/docs/agent/explanation/mcp_integration' }
-            ]
+              { text: 'Design Choices', link: '/docs/agent/explanation/design_choices' }]
           }
         ]
       },

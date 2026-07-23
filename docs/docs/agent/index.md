@@ -29,8 +29,6 @@ of things.
 
 * **[Getting Started](tutorials/getting_started.md)**: I'll walk you through the
   first installation and setup.
-* **[MCP Getting Started](tutorials/mcp_getting_started.md)**: Learn how to
-  connect your AI assistants to your infrastructure using the MCP server.
 
 ## 2. How-to Guides
 
@@ -44,8 +42,6 @@ Got a specific goal in mind? These guides will show you exactly how to reach it.
   pipelines is a breeze.
 * **[Secure Configuration](how-to/secure_configuration.md)**: Let's make sure
   your credentials stay private.
-* **[Configure MCP with SSE](how-to/configure_mcp_sse.md)**: Setting up the MCP
-  server for web clients is easier than you think.
 * **[Detect Copy Fail Vulnerability](how-to/detect-copy-fail-vulnerability.md)**:
   Diagnose CVE-2026-31431 on your servers using a safe, non-destructive tool.
 
@@ -55,8 +51,6 @@ Looking for the technical details? You'll find everything you need right here.
 
 * **[CLI Commands](reference/cli_commands.md)**: A complete list of commands
   like `build`, `verify`, and `version`.
-* **[MCP Tools](reference/mcp_tools.md)**: All the tools and prompts available
-  for your AI assistants.
 * **[Configuration](reference/configuration.md)**: Every parameter you can tweak
   in `txlog.yaml`.
 * **[Environment Variables](reference/environment_variables.md)**: From
@@ -75,8 +69,6 @@ scenes.
   documented the logic we use to keep everything in sync.
 * **[Design Choices](explanation/design_choices.md)**: Why we chose Go, Cobra,
   and Regex for this project.
-* **[MCP Integration](explanation/mcp_integration.md)**: The "why" and "how" of
-  our Model Context Protocol integration.
 * **[Copy Fail Detection Logic](explanation/copy-fail-detection.md)**: A deep
   dive into how we safely detect kernel vulnerabilities like CVE-2026-31431.
 
