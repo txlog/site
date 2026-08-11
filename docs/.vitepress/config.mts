@@ -8,6 +8,11 @@ export default defineConfig({
   ignoreDeadLinks: [
     /^http:\/\/localhost/
   ],
+  head: [
+    ['link', { rel: 'preconnect', href: 'https://fonts.googleapis.com' }],
+    ['link', { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' }],
+    ['link', { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=JetBrains+Mono:wght@400;500&display=swap' }]
+  ],
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config`
     logo: '/images/logbook.png',
@@ -16,15 +21,32 @@ export default defineConfig({
       provider: 'local'
     },
 
+    outline: { level: [2, 3], label: 'On this page' },
+
+    editLink: {
+      pattern: 'https://github.com/txlog/site/edit/main/docs/:path',
+      text: 'Edit this page'
+    },
+
+    footer: {
+      message: 'Released under the MIT License.',
+      copyright: 'Transaction Log · <a href="https://github.com/txlog">github.com/txlog</a>'
+    },
+
     nav: [
+      { text: 'Agent', link: '/docs/agent', activeMatch: '/docs/agent' },
+      { text: 'Server', link: '/docs/server', activeMatch: '/docs/server' },
+      { text: 'Docs', link: '/docs', activeMatch: '/docs$' },
       { component: 'AgentVersionBadge' },
       { component: 'ServerVersionBadge' }
     ],
 
-    sidebar: [
+    // Escopado por caminho: a home (layout: page) não recebe sidebar.
+    sidebar: {
+      '/docs/': [
       {
         text: 'Agent',
-        collapsed: true,
+        collapsed: false,
         items: [
           { text: 'Quick Start', link: '/docs/agent' },
           {
@@ -36,7 +58,7 @@ export default defineConfig({
           },
           {
             text: 'How-to',
-            collapsed: true,
+            collapsed: false,
             items: [
               { text: 'Configure Authentication', link: '/docs/agent/how-to/configure_authentication' },
               { text: 'Run in CI/CD', link: '/docs/agent/how-to/run_in_cicd' },
@@ -46,7 +68,7 @@ export default defineConfig({
           },
           {
             text: 'Reference',
-            collapsed: true,
+            collapsed: false,
             items: [
               { text: 'CLI Commands', link: '/docs/agent/reference/cli_commands' },
               { text: 'Configuration', link: '/docs/agent/reference/configuration' },
@@ -54,7 +76,7 @@ export default defineConfig({
           },
           {
             text: 'Explanation',
-            collapsed: true,
+            collapsed: false,
             items: [
               { text: 'Architecture Overview', link: '/docs/agent/explanation/architecture_overview' },
               { text: 'Data Collection', link: '/docs/agent/explanation/data_collection' },
@@ -65,7 +87,7 @@ export default defineConfig({
       },
       {
         text: 'Server',
-        collapsed: true,
+        collapsed: false,
         items: [
           { text: 'Quick Start', link: '/docs/server' },
           {
@@ -78,7 +100,7 @@ export default defineConfig({
           },
           {
             text: 'How-to',
-            collapsed: true,
+            collapsed: false,
             items: [
               { text: 'Configure Data Retention', link: '/docs/server/how-to/configure-data-retention' },
               { text: 'Configure LDAP Anonymous', link: '/docs/server/how-to/configure-ldap-anonymous' },
@@ -96,7 +118,7 @@ export default defineConfig({
           },
           {
             text: 'Reference',
-            collapsed: true,
+            collapsed: false,
             items: [
               { text: 'API Reference', link: '/docs/server/reference/api-reference' },
               { text: 'Database Schema', link: '/docs/server/reference/database-schema' },
@@ -108,7 +130,7 @@ export default defineConfig({
           },
           {
             text: 'Explanation',
-            collapsed: true,
+            collapsed: false,
             items: [
               { text: 'Architecture', link: '/docs/server/explanation/architecture' },
               { text: 'Data Model', link: '/docs/server/explanation/data-model' },
@@ -120,7 +142,8 @@ export default defineConfig({
           }
         ]
       }
-    ],
+      ]
+    },
 
     socialLinks: [
       { icon: 'github', link: 'https://github.com/txlog' }
