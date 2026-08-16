@@ -13,6 +13,11 @@ export default defineConfig({
     ['link', { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' }],
     ['link', { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=JetBrains+Mono:wght@400;500&display=swap' }]
   ],
+  // custom.css forces a dark code-block background in both modes,
+  // so the light Shiki theme would paint dark text on it.
+  markdown: {
+    theme: { light: 'github-dark', dark: 'github-dark' }
+  },
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config`
     logo: '/images/logbook.png',

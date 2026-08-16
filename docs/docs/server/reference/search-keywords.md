@@ -8,15 +8,10 @@ manually in the search field.
 
 | Keyword | Description |
 | :--- | :--- |
-| `copyfail:true` | Filters assets vulnerable to **CVE-2026-31431 (Copy Fail)**. |
 | `restart:true` | Filters assets that require a system restart. |
 | `inactive:true` | Filters assets that have been inactive for more than 15 days. |
 
 ## Usage Examples
-
-### Find vulnerable assets
-
-Search for: `copyfail:true`
 
 ### Find assets that need restart
 
@@ -28,10 +23,10 @@ Search for: `inactive:true`
 
 ### Combine keywords with text
 
-Search for: `prod-server copyfail:true`
+Search for: `prod-server restart:true`
 
-This will find assets with a hostname containing "prod-server" that are also
-vulnerable to CVE-2026-31431.
+This will find assets with a hostname containing "prod-server" that also require
+a system restart.
 
 ## Related Documentation
 

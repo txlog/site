@@ -42,8 +42,6 @@ Got a specific goal in mind? These guides will show you exactly how to reach it.
   pipelines is a breeze.
 * **[Secure Configuration](how-to/secure_configuration.md)**: Let's make sure
   your credentials stay private.
-* **[Detect Copy Fail Vulnerability](how-to/detect-copy-fail-vulnerability.md)**:
-  Diagnose CVE-2026-31431 on your servers using a safe, non-destructive tool.
 
 ## 3. Reference
 
@@ -69,8 +67,6 @@ scenes.
   documented the logic we use to keep everything in sync.
 * **[Design Choices](explanation/design_choices.md)**: Why we chose Go, Cobra,
   and Regex for this project.
-* **[Copy Fail Detection Logic](explanation/copy-fail-detection.md)**: A deep
-  dive into how we safely detect kernel vulnerabilities like CVE-2026-31431.
 
 ## Quick Links
 

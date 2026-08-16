@@ -130,8 +130,6 @@ internal logic behind asset search and filtering.
 
 ### Deep Dives
 
-- **[Copy Fail Detection](explanation/copy-fail-detection.md)**: Technical
-deep dive into CVE-2026-31431 and our safety guarantees.
 - **[LDAP Authentication Deep Dive](explanation/ldap-deep-dive.md)**: A thorough
 look at how we handle LDAP under the hood.
 - **[LDAP Implementation Details](explanation/ldap-implementation-details.md)**:
